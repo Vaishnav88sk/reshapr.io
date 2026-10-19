@@ -4,6 +4,12 @@ verification:
   product: reShapr CLI
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Automate reShapr with the CLI in CI/CD
@@ -16,8 +22,8 @@ reShapr provides scriptable CLI and API operations. It does not provide a native
 
 You need:
 
-- Node.js 20 or later and reShapr CLI `1.0.0` installed in the job image;
-- a reShapr `1.0.0` control plane and a running proxy registered as a Gateway in the default Gateway Group;
+- Node.js 20 or later and reShapr CLI `1.1.0` installed in the job image;
+- a reShapr `1.1.0` control plane and a running proxy registered as a Gateway in the default Gateway Group;
 - a dedicated automation identity restricted to the target organization;
 - the identity password stored as a masked CI secret;
 - an OpenAPI 3, GraphQL, or Protobuf source tracked by the build;
@@ -33,7 +39,7 @@ export RESHAPR_SERVER='https://app.reshapr.example.com'
 export RESHAPR_USERNAME='ci-release'
 export RESHAPR_ORGANIZATION='production'
 export SERVICE_NAME='Weather API'
-export SERVICE_VERSION='1.0.0'
+export SERVICE_VERSION='1.1.0'
 export API_DEFINITION='openapi/weather.yaml'
 export BACKEND_ENDPOINT='https://weather-api.production.example.com'
 ```
@@ -124,7 +130,7 @@ IMPORT_RESULT="$(
 )"
 ```
 
-For the same Service name and version, release `1.0.0` updates the imported Service instead of creating a duplicate. With `--backendEndpoint`, it creates the `default` Configuration Plan and Exposition when absent, then reuses them on later imports.
+For the same Service name and version, release `1.1.0` updates the imported Service instead of creating a duplicate. With `--backendEndpoint`, it creates the `default` Configuration Plan and Exposition when absent, then reuses them on later imports.
 
 Validate the complete structured result before using any identifier:
 
@@ -149,7 +155,7 @@ export EXPOSITION_ID="$(jq -er '.exposition.id' <<<"${IMPORT_RESULT}")"
 unset IMPORT_RESULT SERVICE_LIST
 ```
 
-If the existing `default` Plan targets another backend, `import --backendEndpoint` deliberately retains that value. The assertion then fails. Changing an existing Plan through `reshapr config update` opens an interactive editor in `1.0.0`; use a separately reviewed API operation or a controlled replacement workflow instead of automating the editor.
+If the existing `default` Plan targets another backend, `import --backendEndpoint` deliberately retains that value. The assertion then fails. Changing an existing Plan through `reshapr config update` opens an interactive editor in `1.1.0`; use a separately reviewed API operation or a controlled replacement workflow instead of automating the editor.
 
 ## Verify the postconditions
 
@@ -244,7 +250,7 @@ The job authenticates without a password argument, observes existing state, impo
 
 - This guide supplies a portable Bash workflow, not a ready-made pipeline for a specific CI product.
 - `import --backendEndpoint` reuses an existing `default` Plan and does not update its backend endpoint.
-- `reshapr config update` is interactive in `1.0.0` and is unsuitable for an unattended job.
+- `reshapr config update` is interactive in `1.1.0` and is unsuitable for an unattended job.
 - The default import-and-expose path targets the built-in default Gateway Group. Use explicit Plan and Exposition API operations when another group is required.
 - The CLI does not provide a universal create-or-update command for every resource type.
 - Structured output does not provide transactionality, locking, drift detection, approval, retry, or rollback semantics.
@@ -254,4 +260,4 @@ The job authenticates without a password argument, observes existing state, impo
 
 Use **[Manage reShapr Resources with GitOps](./manage-resources-with-gitops.md)** when Kubernetes controllers should own desired state. Review **[Product Interfaces](../references/interfaces.md)** to choose between the CLI, public APIs, Web UI, and Kubernetes controllers.
 
-The release-tagged [CLI implementation](https://github.com/reshaprio/reshapr/tree/1.0.0/cli) and [public API contract](https://github.com/reshaprio/reshapr/blob/1.0.0/reshapr-public-openapi-v0.1.yaml) remain the canonical interface references.
+The release-tagged [CLI implementation](https://github.com/reshaprio/reshapr/tree/1.1.0/cli) and [public API contract](https://github.com/reshaprio/reshapr/blob/1.1.0/reshapr-public-openapi-v0.1.yaml) remain the canonical interface references.

@@ -1,10 +1,10 @@
 # Documentation coverage matrix
 
-**Assessed:** 2026-09-21
+**Assessed:** 2026-10-19
 
-**Product baseline:** reShapr `1.0.0`, controllers `0.0.3`, Helm charts `0.0.14`
+**Product baseline:** reShapr `1.1.0`, controllers `0.0.4`, corrected Helm charts `0.0.15`
 
-**Corpus:** 52 authored docs pages, 8 blog files, and 2 content tests
+**Corpus:** 57 authored docs pages, 9 blog files, and 2 content test files
 
 This matrix maps the semantic IDs in [`product-baseline.md`](product-baseline.md) to the current authored corpus. A blank Diataxis column is not automatically a gap: a capability needs only the page types that serve a real reader task.
 
@@ -32,6 +32,7 @@ Coverage statuses:
 | `CAP-ARTIFACT-SELECTION` | covered | `docs/tutorials/context-control-in-practice.md` | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/configuration-and-exposition.md` | `docs/references/features.md` |
 | `CAP-DECLARATIVE-CUSTOM-TOOLS` | covered | `docs/tutorials/context-control-in-practice.md` | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/context-control.md` | `docs/references/custom-tools-specification.md` |
 | `CAP-SCRIPTED-CUSTOM-TOOLS` | covered | - | `docs/how-to-guides/build-scripted-custom-tool.md` | `docs/explanations/api-to-agent.md` | `docs/references/custom-tools-specification.md` |
+| `CAP-CODE-MODE` | covered | - | `docs/how-to-guides/use-code-mode.md` | `docs/explanations/code-mode.md` | `docs/references/features.md`<br>`docs/references/environment-variables.md` |
 | `CAP-TOOLS-OUTPUT-FILTERING` | covered | `docs/tutorials/context-control-in-practice.md` | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/context-control.md` | `docs/references/spec-outtools-filtering.md` |
 | `CAP-TOON-OUTPUT` | covered | `docs/tutorials/context-control-in-practice.md` | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/context-control.md` | `docs/references/spec-outtools-filtering.md` |
 | `CAP-ARTIFACT-LIFECYCLE` | covered | - | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/resource-lifecycle.md` | `docs/references/cli-commands.md` |
@@ -47,6 +48,7 @@ Coverage statuses:
 | `CAP-MCP-TOOLS` | covered | `docs/tutorials/getting-started.md` | `docs/how-to-guides/test-mcp-endpoint.md` | `docs/explanations/api-to-agent.md` | `docs/references/mcp-support.md` |
 | `CAP-MCP-PROMPTS` | covered | `docs/tutorials/context-control-in-practice.md` | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/services-and-artifacts.md` | `docs/references/prompts-specification.md` |
 | `CAP-MCP-RESOURCES` | covered | `docs/tutorials/context-control-in-practice.md` | `docs/how-to-guides/select-reshapr-artifacts.md` | `docs/explanations/services-and-artifacts.md` | `docs/references/resources-specification.md` |
+| `CAP-MCP-APPS-REFERENCES` | covered | - | `docs/how-to-guides/reference-mcp-app.md` | - | `docs/references/resources-specification.md`<br>`docs/references/features.md` |
 | `CAP-MCP-URL-ELICITATION` | covered | - | `docs/how-to-guides/security/backend-auth-and-elicitation.md` | `docs/explanations/security-model.md` | `docs/references/mcp-support.md` |
 | `CAP-MCP-CACHE-HINTS` | covered | - | - | `docs/explanations/configuration-and-exposition.md` | `docs/references/mcp-support.md` |
 | `CAP-MCP-ADDITIONAL-SERVER-METHODS` | not-documentable | - | - | `docs/explanations/mcp-compatibility.md` (boundary) | `docs/references/mcp-support.md` (boundary) |
@@ -88,6 +90,7 @@ Coverage statuses:
 | `CAP-MCP-RATE-LIMITING` | not-documentable | - | `docs/how-to-guides/administration/organization-quotas.md` (boundary) | `docs/explanations/multi-tenancy-administrative-governance.md` (boundary) | - |
 | `CAP-MCP-AUDIT-EVENTS` | covered | - | `docs/how-to-guides/audit-mcp-endpoint.md`<br>`docs/how-to-guides/operations/observe-and-audit.md` | `docs/explanations/security-model.md` | `docs/references/features.md` |
 | `CAP-PROXY-OPENTELEMETRY` | covered | - | `docs/how-to-guides/operations/observe-and-audit.md` | `docs/explanations/deployment-models-trust-boundaries.md` | `docs/references/features.md` |
+| `CAP-DIAGNOSTIC-LOGGING` | covered | - | `docs/how-to-guides/operations/troubleshoot.md` | - | `docs/references/logging.md` |
 
 ### User experience
 
@@ -137,6 +140,7 @@ Coverage statuses:
 | `CAP-HELM-CONTROLLER-TOGGLES` | covered | - | `docs/how-to-guides/deploy-kubernetes-production.md` | `docs/explanations/deployment-models-trust-boundaries.md` | `docs/references/helm-charts.md` |
 | `CAP-HELM-WEBHOOK-CERTIFICATE-PROVIDERS` | covered | - | `docs/how-to-guides/deploy-kubernetes-production.md` | `docs/explanations/security-model.md` | `docs/references/helm-charts.md` |
 | `CAP-HELM-ENVIRONMENT-PROFILES` | covered | - | `docs/how-to-guides/deploy-kubernetes-production.md` | `docs/explanations/deployment-models-trust-boundaries.md` | `docs/references/helm-charts.md` |
+| `CAP-RUNTIME-CONFIGURATION` | covered | - | `docs/how-to-guides/operations/troubleshoot.md` | - | `docs/references/environment-variables.md` |
 | `CAP-HELM-COSIGN-SIGNATURES` | covered | - | - | - | `docs/references/helm-charts.md` |
 | `CAP-HELM-UPGRADE-FOUNDATIONS` | covered | - | `docs/how-to-guides/operations/upgrade-and-rotate.md` | `docs/explanations/resource-lifecycle.md` | `docs/references/helm-charts.md` |
 
@@ -148,13 +152,17 @@ There are no `missing` released or partial capabilities in this baseline. Unsupp
 
 | Limitation | Required public surface | Current mentions | Coverage |
 |---|---|---|---|
+| `LIM-CODE-MODE-BOUNDS` | Code Mode guide and runtime reference | `docs/how-to-guides/use-code-mode.md`<br>`docs/explanations/code-mode.md`<br>`docs/references/environment-variables.md` | covered |
+| `LIM-MCP-APPS-HOST` | App guide and Resource reference | `docs/how-to-guides/reference-mcp-app.md`<br>`docs/references/resources-specification.md` | covered |
+| `LIM-DIAGNOSTIC-LOG-SENSITIVE` | Logging instructions and Code Mode auditing | `docs/references/logging.md`<br>`docs/how-to-guides/operations/troubleshoot.md`<br>`docs/how-to-guides/use-code-mode.md` | covered |
+| `LIM-RUNTIME-CONFIG-BUILD-TIME` | Runtime configuration and logging references | `docs/references/environment-variables.md`<br>`docs/references/logging.md` | covered |
 | `LIM-OPENAPI-2-UNSUPPORTED` | Import procedures and capability reference | `docs/how-to-guides/import-api-artifacts.md`<br>`docs/references/features.md` | covered |
 | `LIM-GRAPHQL-METADATA-REQUIRED` | Import procedure | `docs/how-to-guides/import-api-artifacts.md` | covered |
 | `LIM-PROTOBUF-DEPENDENCY-RESOLUTION` | Import procedure | `docs/how-to-guides/import-api-artifacts.md` | covered |
 | `LIM-LOCAL-IMPORT-EXTERNAL-REFS` | Import procedure | `docs/how-to-guides/import-api-artifacts.md` | covered |
 | `LIM-OPERATION-SELECTION-NOT-AUTHORIZATION` | Context Control explanation | `docs/explanations/context-control.md` | covered |
 | `LIM-SCRIPT-RUNTIME-BOUNDS` | Script reference and procedure | `docs/references/custom-tools-specification.md`<br>`docs/how-to-guides/build-scripted-custom-tool.md` | covered |
-| `LIM-OUTPUT-FILTER-FAILS-OPEN` | Filter reference and any security-sensitive example | `docs/references/spec-outtools-filtering.md`<br>`docs/tutorials/context-control-in-practice.md` | covered |
+| `LIM-OUTPUT-FILTER-FAILS-OPEN` | Filter reference and any security-sensitive example | `docs/references/spec-outtools-filtering.md`<br>`docs/tutorials/context-control-in-practice.md`<br>`docs/explanations/code-mode.md` | covered |
 | `LIM-TOON-OUTPUT-ONLY` | Filter reference | `docs/references/spec-outtools-filtering.md`<br>`docs/references/features.md` | covered |
 | `LIM-MCP-NO-WEBSOCKET` | MCP reference and endpoint test | `docs/references/mcp-support.md`<br>`docs/how-to-guides/test-mcp-endpoint.md` | covered |
 | `LIM-MCP-METHODS-UNSUPPORTED` | MCP method matrix | `docs/references/mcp-support.md`<br>`docs/explanations/mcp-compatibility.md` | covered |
@@ -230,6 +238,14 @@ This inventory makes orphaned or accidentally removed pages visible. Paths are g
 | Explanations (11) | `docs/explanations/api-to-agent.md`<br>`docs/explanations/services-and-artifacts.md`<br>`docs/explanations/context-control.md`<br>`docs/explanations/configuration-and-exposition.md`<br>`docs/explanations/resource-lifecycle.md`<br>`docs/explanations/gateway-groups-and-gateways.md`<br>`docs/explanations/control-plane-gateway-synchronization.md`<br>`docs/explanations/mcp-compatibility.md`<br>`docs/explanations/security-model.md`<br>`docs/explanations/multi-tenancy-administrative-governance.md`<br>`docs/explanations/deployment-models-trust-boundaries.md` |
 | References (10) | `docs/references/features.md`<br>`docs/references/interfaces.md`<br>`docs/references/cli-commands.md`<br>`docs/references/mcp-support.md`<br>`docs/references/custom-tools-specification.md`<br>`docs/references/prompts-specification.md`<br>`docs/references/resources-specification.md`<br>`docs/references/spec-outtools-filtering.md`<br>`docs/references/kubernetes-apis.md`<br>`docs/references/helm-charts.md` |
 
+| Additional role | Current pages |
+|---|---|
+| New how-to guides (2) | `docs/how-to-guides/use-code-mode.md`<br>`docs/how-to-guides/reference-mcp-app.md` |
+| New runtime references (2) | `docs/references/environment-variables.md`<br>`docs/references/logging.md` |
+| New explanation (1) | `docs/explanations/code-mode.md` |
+
+The original 52-page inventory above plus these five additions accounts for all 57 current pages. The agent-builder journey now includes progressive Tool discovery with Code Mode, its execution and security model, and MCP Apps references; operators can look up guardrails and enable temporary diagnostics from the new runtime references.
+
 ## Blog classification
 
 Every blog file is `historical-only`, including posts that remain factually accurate. Correct evident factual errors in place, but do not update old posts into evergreen references and do not count them as capability or limitation coverage.
@@ -243,6 +259,7 @@ Every blog file is `historical-only`, including posts that remain factually accu
 | `blog/from-api-sprawl-to-agent-actions.mdx` | published snapshot | historical-only |
 | `blog/reshapr-vs-official-github-mcp.mdx` | published snapshot | historical-only |
 | `blog/building-sync-check-with-reshapr.mdx` | published snapshot | historical-only |
+| `blog/reshapr-1.0.0-release.mdx` | published snapshot | historical-only |
 | `blog/_draft-secure-mcp-deployment-with-reshapr.md` | draft snapshot | historical-only |
 
 ## Automated coverage
@@ -250,6 +267,6 @@ Every blog file is `historical-only`, including posts that remain factually accu
 | Test | Current contract |
 |---|---|
 | `tests/content-negotiation.test.mjs` | HTTP content negotiation and generated Markdown behavior. |
-| `tests/mcp-support.test.mjs` | MCP support claims remain aligned across the reference, explanation, and endpoint guide. |
+| `tests/mcp-support.test.mjs` | MCP support claims, Code Mode examples and guardrails, MCP Apps requirements, and sensitive DEBUG instructions remain aligned with their documented contracts. |
 
 `npm run docs:audit` validates registry parity, allowed statuses, referenced local paths, complete corpus inventory, and the maintenance publication boundary. It does not verify product behavior; repeat the evidence workflow in [`update-playbook.md`](update-playbook.md) for that.

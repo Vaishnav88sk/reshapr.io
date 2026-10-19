@@ -1,5 +1,11 @@
 ---
 description: Explore every reShapr video demo by journey, with prerequisites, expected results, reproducibility status, and written alternatives.
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 <!-- markdownlint-disable MD033 -->
@@ -182,7 +188,7 @@ See how a reShapr MCP endpoint negotiates the current stateless protocol alongsi
       <p class="youtube-demo-meta">Published August 5, 2026 · 52 seconds · MCP 2026-07-28</p>
       <p><strong>Prerequisite:</strong> a reShapr MCP endpoint and a compatible MCP client.</p>
       <p><strong>Result:</strong> the client negotiates the stateless protocol mode.</p>
-      <p class="youtube-demo-status">Supported by reShapr 1.0.0 · Video replay not independently verified.</p>
+      <p class="youtube-demo-status">Supported by reShapr 1.1.0 · Video replay not independently verified.</p>
       <p><a href="/docs/explanations/mcp-compatibility">Written alternative</a> · <a href="https://youtu.be/iqk3lcuASD8" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>

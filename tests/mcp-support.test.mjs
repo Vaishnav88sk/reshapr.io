@@ -61,7 +61,92 @@ function readOwnerSource(relativePath) {
   return fs.existsSync(sourcePath) ? fs.readFileSync(sourcePath, 'utf8') : null;
 }
 
-test('publishes the exact reShapr 1.0.0 protocol versions and modes', () => {
+test('documents Code Mode discovery and a locally executable reduced-result example', () => {
+  const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/use-code-mode.md'), 'utf8');
+  const modeSection = section(guide, 'Choose the Tool exposure mode');
+  assert.deepEqual(columnValues(modeSection, 0), ['TOOLS', 'CODE', 'HYBRID']);
+  const calls = [...guide.matchAll(/```json\n([\s\S]*?)\n```/g)].map(match => JSON.parse(match[1]));
+  assert.deepEqual(calls.map(call => call.name), ['search_tools', 'get_api_types', 'execute_code']);
+  const run = new Function('api', 'rs', calls[2].arguments.code);
+  const response = run({get_v1_forecast: () => ({ok: true, content: {current: {temperature_2m: 18}, unused: 'omit'}})}, {});
+  assert.deepEqual(response, {temperature: 18});
+  assert.throws(() => run({get_v1_forecast: () => ({ok: false, error: 'backend'})}, {
+    fail(message) { throw new Error(message); },
+  }), /Forecast failed/);
+  assert.match(guide, /not transactional/);
+  assert.match(guide, /logs submitted source at INFO/);
+});
+
+test('explains Code Mode flows and security boundaries with release-scoped evidence', async () => {
+  const explanation = fs.readFileSync(path.join(repositoryRoot, 'docs/explanations/code-mode.md'), 'utf8');
+  const flows = section(explanation, 'Discovery and Execution Flows');
+  assert.deepEqual(columnValues(flows, 0), ['TOOLS', 'CODE', 'HYBRID']);
+  assert.match(flows, /Elicitation response \(sandbox has not started\)/);
+  const diagram = flows.match(/```mermaid\n([\s\S]*?)\n```/);
+  assert.ok(diagram, 'Missing Code Mode sequence diagram');
+  const {default: mermaid} = await import('mermaid');
+  mermaid.initialize({startOnLoad: false});
+  await mermaid.parse(diagram[1]);
+  const security = section(explanation, 'Security Model');
+  assert.match(security, /first level of declared dependencies/);
+  assert.match(security, /not recursively traverse/);
+  assert.match(security, /output filtering can fail open/);
+  const limits = section(explanation, 'Guardrails and Their Boundaries');
+  assert.deepEqual(columnValues(limits, 1), ['10,000 ms', '10', '4,000 characters', '100,000 characters', '5', '256 pages of 64 KiB (16 MiB)']);
+  assert.match(limits, /CPU-only infinite loop stops on timeout/);
+  assert.match(limits, /does not bound total JVM memory/);
+  assert.match(section(explanation, 'Failures and Side Effects'), /not transactional/);
+  assert.match(section(explanation, 'Audit and Trace Visibility'), /logs submitted source at \*\*INFO\*\*/);
+  const ownerLinks = [...explanation.matchAll(/https:\/\/github\.com\/reshaprio\/reshapr\/blob\/([^/]+)\//g)];
+  assert.ok(ownerLinks.length >= 4);
+  assert.ok(ownerLinks.every(match => match[1] === '1.1.0'));
+  for (const page of ['docs/how-to-guides/use-code-mode.md', 'docs/references/features.md']) {
+    assert.ok(fs.readFileSync(path.join(repositoryRoot, page), 'utf8').includes('../explanations/code-mode.md'), `Missing explanation link in ${page}`);
+  }
+  assert.ok(fs.readFileSync(path.join(repositoryRoot, 'sidebars.js'), 'utf8').includes("id: 'explanations/code-mode'"));
+});
+
+test('documents all injected script and Code Mode guardrails with their defaults', (context) => {
+  const reference = fs.readFileSync(path.join(repositoryRoot, 'docs/references/environment-variables.md'), 'utf8');
+  const source = readOwnerSource('proxy/src/main/java/io/reshapr/proxy/mcp/ToolCallExecutor.java');
+  if (!source) {
+    context.skip('Set RESHAPR_SOURCE_DIR to compare injected guardrail defaults');
+    return;
+  }
+  const settings = [...source.matchAll(/@ConfigProperty\(name = "(reshapr\.gateway\.(?:code-mode|scripting)\.[^"]+)", defaultValue = "([^"]+)"\)/g)];
+  assert.equal(settings.length, 8);
+  for (const [, property, defaultValue] of settings) {
+    const variable = property.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+    const row = reference.split('\n').find(line => line.startsWith(`| \`${variable}\` |`));
+    assert.ok(row, `Missing ${variable}`);
+    assert.ok(row.includes(`| \`${defaultValue}\` |`), `Wrong default for ${variable}`);
+  }
+});
+
+test('keeps MCP Apps hosting and client requirements visible', () => {
+  const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/reference-mcp-app.md'), 'utf8');
+  for (const field of ['ui://user/mcp-app.html', 'text/html;profile=mcp-app', 'remoteContent:', 'resourceDomains:', 'visibility:']) {
+    assert.ok(guide.includes(field), `Missing MCP App field ${field}`);
+  }
+  assert.match(guide, /Apps-capable host/);
+  assert.match(guide, /does not .*provide application hosting/);
+  assert.match(guide, /blob\/1\.1\.0\/dev\/github-api-resources\.yaml/);
+});
+
+test('keeps DEBUG deployment instructions and sensitive-data warnings together', () => {
+  const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/operations/troubleshoot.md'), 'utf8');
+  const debugSection = section(guide, 'Enable debug logs temporarily');
+  for (const setting of ['QUARKUS_LOG_CATEGORY__IO_RESHAPR_PROXY__LEVEL', 'QUARKUS_OTEL_SDK_DISABLED', 'admissionController.extraEnv']) {
+    assert.ok(debugSection.includes(setting), `Missing debug setting ${setting}`);
+  }
+  assert.match(debugSection, /Sensitive diagnostic data/);
+  assert.match(debugSection, /docker logs/);
+  assert.match(debugSection, /podman logs/);
+  assert.match(debugSection, /restore|Remove|remove/);
+  assert.ok(debugSection.includes('../../references/logging.md'));
+});
+
+test('publishes the exact reShapr 1.1.0 protocol versions and modes', () => {
   const versionSection = section(supportPage, 'Protocol versions and modes');
   assert.deepEqual(columnValues(versionSection, 0), supportedVersions);
   assert.match(versionSection, /\| `2026-07-28` \| Stateless \| `server\/discover` \|/);
@@ -95,7 +180,7 @@ test('documents both response dialects and release-tagged evidence', () => {
 
   const ownerLinks = [...supportPage.matchAll(/https:\/\/github\.com\/reshaprio\/reshapr\/blob\/([^/]+)\//g)];
   assert.ok(ownerLinks.length >= 5);
-  assert.ok(ownerLinks.every((match) => match[1] === '1.0.0'));
+  assert.ok(ownerLinks.every((match) => match[1] === '1.1.0'));
 });
 
 test('matches McpSchema and McpController when the owner checkout is available', (context) => {

@@ -4,6 +4,12 @@ verification:
   product: reShapr
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Web UI Quickstart: From Import to Exposition
@@ -12,7 +18,7 @@ Use the Web UI Quick Start to turn a public OpenAPI 3 contract into an MCP endpo
 
 ## Prerequisites
 
-- Access to a reShapr `1.0.0` Web UI and an account that can create Services, Configuration Plans, and Expositions
+- Access to a reShapr `1.1.0` Web UI and an account that can create Services, Configuration Plans, and Expositions
 - At least one running proxy registered as a Gateway in the **Default Gateway Group**
 - Outbound access from the control plane to GitHub and from the proxy to `https://api.open-meteo.com`
 
@@ -41,7 +47,7 @@ On the **Import** stage:
 
 The result should identify a Service named **Open-Meteo Weather Forecast API**, version `1.0`, with its OpenAPI contract as the main Artifact. The Service identifier shown by your environment is generated and will differ from other installations.
 
-If the format is not recognized, confirm that you used the raw file URL and that the document declares OpenAPI 3.x. Swagger and OpenAPI 2.x documents are not supported in reShapr `1.0.0`. See **[Import OpenAPI, GraphQL, or Protobuf Artifacts](../how-to-guides/import-api-artifacts.md)** for format-specific troubleshooting.
+If the format is not recognized, confirm that you used the raw file URL and that the document declares OpenAPI 3.x. Swagger and OpenAPI 2.x documents are not supported in reShapr `1.1.0`. See **[Import OpenAPI, GraphQL, or Protobuf Artifacts](../how-to-guides/import-api-artifacts.md)** for format-specific troubleshooting.
 
 ## Review optional Artifacts
 
@@ -108,6 +114,6 @@ You used the Web UI to import an OpenAPI 3 contract, inspect its Service, config
 
 ## Evidence and limits
 
-This tutorial was last verified with reShapr `1.0.0` on 2026-09-18. Its workflow follows the release-tagged **[Quick Start wizard](https://github.com/reshaprio/reshapr/blob/1.0.0/web-ui/src/lib/components/artifacts/QuickStartWizard.svelte)** and **[Artifact import form](https://github.com/reshaprio/reshapr/blob/1.0.0/web-ui/src/lib/components/artifacts/ImportArtifactForm.svelte)**.
+This tutorial was last verified with reShapr `1.1.0` on 2026-09-18. Its workflow follows the release-tagged **[Quick Start wizard](https://github.com/reshaprio/reshapr/blob/1.1.0/web-ui/src/lib/components/artifacts/QuickStartWizard.svelte)** and **[Artifact import form](https://github.com/reshaprio/reshapr/blob/1.1.0/web-ui/src/lib/components/artifacts/ImportArtifactForm.svelte)**.
 
 Quick Start uses the `default` Plan and Default Gateway Group rather than asking you to choose names or a target group. Use the full Plan and Exposition views when you need several Plans, another Gateway Group, or more control over the exposed MCP surface.

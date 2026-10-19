@@ -4,6 +4,12 @@ verification:
   product: reShapr
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Manage Organizations, Owners, and Memberships
@@ -18,10 +24,10 @@ For federated users, first configure **[control-plane OIDC authentication](../co
 
 You need:
 
-- a reShapr `1.0.0` control plane;
+- a reShapr `1.1.0` control plane;
 - the deployment-wide administration API key;
 - at least one existing user to assign as owner or member;
-- reShapr CLI `1.0.0` for the CLI path;
+- reShapr CLI `1.1.0` for the CLI path;
 - a deployed Web UI configured with its server-side administration API key for the Web UI path;
 - `curl` and `jq` for the API path;
 - access to a target user's normal login flow for the final membership check.
@@ -35,17 +41,17 @@ export OWNER_USERNAME='platform-owner'
 export MEMBER_USERNAME='release-engineer'
 ```
 
-Organization names in `1.0.0` contain only letters, digits, and underscores, with a maximum length of 100 characters.
+Organization names in `1.1.0` contain only letters, digits, and underscores, with a maximum length of 100 characters.
 
 ## Choose an administration path
 
-| Path | Supported workflow in `1.0.0` |
+| Path | Supported workflow in `1.1.0` |
 |---|---|
 | Web UI | Create organizations, assign or replace owners, create local users, and assign memberships during local-user creation |
 | CLI | Create organizations with or without an owner and replace all memberships of an existing user |
 | Administration API | Create organizations, assign or replace owners, and replace all memberships of an existing user |
 
-The Web UI does not provide a membership editor for an existing user in `1.0.0`. Use the CLI or API for that operation.
+The Web UI does not provide a membership editor for an existing user in `1.1.0`. Use the CLI or API for that operation.
 
 ## Create and delegate with the Web UI
 
@@ -97,7 +103,7 @@ jq -e --arg name "${RESHAPR_ORGANIZATION}" \
   '.name == $name' <<<"${ORGANIZATION}" >/dev/null
 ```
 
-Omit `--owner` to create an unowned organization. The CLI does not expose a command for assigning or replacing the owner of an existing organization in `1.0.0`; use the Web UI or administration API for that operation.
+Omit `--owner` to create an unowned organization. The CLI does not expose a command for assigning or replacing the owner of an existing organization in `1.1.0`; use the Web UI or administration API for that operation.
 
 ## Replace memberships with the CLI
 
@@ -204,7 +210,7 @@ curl --fail --silent --show-error \
       'index($organization) != null'
 ```
 
-An empty array removes all memberships from that user. In `1.0.0`, this operation does not reconcile organization ownership, update the user's default organization, or expose a dedicated read endpoint for the user's complete membership list. Preserve the intended list in an authoritative source outside this write-only workflow.
+An empty array removes all memberships from that user. In `1.1.0`, this operation does not reconcile organization ownership, update the user's default organization, or expose a dedicated read endpoint for the user's complete membership list. Preserve the intended list in an authoritative source outside this write-only workflow.
 
 ## Verify effective membership
 
@@ -217,7 +223,7 @@ reshapr info
 
 `switch-org` exits non-zero with `403` when the authenticated user is not a member. A successful switch produces a new user token scoped to the target organization; `reshapr info` confirms the active context.
 
-Repeat this check for the owner and every member whose access is required. It catches unknown organization names that the `1.0.0` membership replacement endpoint can otherwise omit from persistence while echoing the submitted list.
+Repeat this check for the owner and every member whose access is required. It catches unknown organization names that the `1.1.0` membership replacement endpoint can otherwise omit from persistence while echoing the submitted list.
 
 ## Result
 
@@ -228,8 +234,8 @@ The organization exists with an explicit owner, and each intended user can selec
 - The administration API key is global to the deployment, not scoped to one organization.
 - Ownership does not provide physical infrastructure isolation or replace membership checks.
 - `membership set` and its API endpoint replace all memberships; they are not additive operations.
-- The Web UI `1.0.0` assigns memberships only during local-user creation and cannot edit an existing user's memberships.
-- The `1.0.0` administration API does not expose a dedicated operation for reading a user's complete memberships.
+- The Web UI `1.1.0` assigns memberships only during local-user creation and cannot edit an existing user's memberships.
+- The `1.1.0` administration API does not expose a dedicated operation for reading a user's complete memberships.
 - Membership replacement does not update the user's default organization.
 - Membership replacement can remove an owner's access without clearing the organization's owner field.
 - Creating or assigning an organization does not provision compute, storage, network policy, or a dedicated database schema.
@@ -239,4 +245,4 @@ The organization exists with an explicit owner, and each intended user can selec
 
 Use **[Assign and Monitor Organization Quotas](./organization-quotas.md)** to bound the resources the new organization can create. Review **[Multi-tenancy and Administrative Governance](../../explanations/multi-tenancy-administrative-governance.md)** for isolation, identity, and offboarding boundaries.
 
-The release-tagged [administration API contract](https://github.com/reshaprio/reshapr/blob/1.0.0/reshapr-admin-ctrl-openapi-v0.1.yaml), [administrative CLI guide](https://github.com/reshaprio/reshapr/blob/1.0.0/cli/ADMIN_CLI.md), and [Web UI implementation](https://github.com/reshaprio/reshapr/tree/1.0.0/web-ui) remain the canonical interface references.
+The release-tagged [administration API contract](https://github.com/reshaprio/reshapr/blob/1.1.0/reshapr-admin-ctrl-openapi-v0.1.yaml), [administrative CLI guide](https://github.com/reshaprio/reshapr/blob/1.1.0/cli/ADMIN_CLI.md), and [Web UI implementation](https://github.com/reshaprio/reshapr/tree/1.1.0/web-ui) remain the canonical interface references.

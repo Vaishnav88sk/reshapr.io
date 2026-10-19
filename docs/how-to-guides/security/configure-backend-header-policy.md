@@ -4,6 +4,12 @@ verification:
   product: reShapr
   version: 1.0.0 / controllers 0.0.3
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Configure Backend Request Header Policy
@@ -16,8 +22,8 @@ This guide shows the CLI and Kubernetes forms of the same policy, then verifies 
 
 You need:
 
-- reShapr `1.0.0` and its CLI;
-- for the Kubernetes path, controllers `0.0.3`;
+- reShapr `1.1.0` and its CLI;
+- for the Kubernetes path, controllers `0.0.4`;
 - an imported REST, GraphQL, or gRPC Service;
 - an OAuth-protected Configuration Plan or the inputs needed to create one;
 - a test backend operation that returns or records received request headers;
@@ -115,7 +121,7 @@ spec:
 
 Add this block to a complete Configuration Plan manifest whose Service, backend endpoint, endpoint OAuth policy, and Secret references are already defined. Apply it through the same GitOps workflow that owns the Plan, then wait for its status to become `READY`.
 
-The controller API also reserves `spec.headerPolicy.response`. In controllers `0.0.3` and reShapr `1.0.0`, response rules are not enforced by the proxy. Do not configure them as a security control.
+The controller API also reserves `spec.headerPolicy.response`. In controllers `0.0.4` and reShapr `1.1.0`, response rules are not enforced by the proxy. Do not configure them as a security control.
 
 ## Verify the forwarded headers
 
@@ -143,7 +149,7 @@ jq -n \
         "io.modelcontextprotocol/protocolVersion": "2026-07-28",
         "io.modelcontextprotocol/clientInfo": {
           name: "reshapr-header-policy-check",
-          version: "1.0.0"
+          version: "1.1.0"
         },
         "io.modelcontextprotocol/clientCapabilities": {}
       }
@@ -174,7 +180,7 @@ Also confirm that MCP transport headers such as `MCP-Protocol-Version` did not r
 ## Limits
 
 - For gRPC backends, the same request policy applies before headers become call metadata. The proxy additionally removes `Accept`, `Content-Type`, and `User-Agent`, which the gRPC transport manages.
-- Response header rules are reserved but not enforced in reShapr `1.0.0`.
+- Response header rules are reserved but not enforced in reShapr `1.1.0`.
 - Explicitly allowing `Authorization` or `Cookie` transfers their security impact to the backend.
 - Rename rules express an intentional trust transition and can target a normally denied header such as `Authorization`.
 - Header filtering does not restrict which Tools are visible or callable.
@@ -183,4 +189,4 @@ Also confirm that MCP transport headers such as `MCP-Protocol-Version` did not r
 
 Use **[Authenticate Backend Calls and Use Elicitation](./backend-auth-and-elicitation.md)** when the backend credential should come from a reShapr Secret instead of an MCP client header. Review **[Configuration Plans and Expositions](../../explanations/configuration-and-exposition.md)** for the wider composition model.
 
-The release-tagged [header policy engine](https://github.com/reshaprio/reshapr/blob/1.0.0/proxy/src/main/java/io/reshapr/proxy/proxy/HeaderPolicyEngine.java), [gRPC proxy integration](https://github.com/reshaprio/reshapr/blob/1.0.0/proxy/src/main/java/io/reshapr/proxy/proxy/GrpcProxyService.java), [runtime tests](https://github.com/reshaprio/reshapr/blob/1.0.0/proxy/src/test/java/io/reshapr/proxy/proxy/HeaderPolicyEngineTest.java), and [controllers API](https://github.com/reshaprio/reshapr-controllers/blob/0.0.3/api/src/main/java/io/reshapr/kubernetes/api/configurationplan/v1alpha1/HeaderPolicy.java) own the behavior described here.
+The release-tagged [header policy engine](https://github.com/reshaprio/reshapr/blob/1.1.0/proxy/src/main/java/io/reshapr/proxy/proxy/HeaderPolicyEngine.java), [gRPC proxy integration](https://github.com/reshaprio/reshapr/blob/1.1.0/proxy/src/main/java/io/reshapr/proxy/proxy/GrpcProxyService.java), [runtime tests](https://github.com/reshaprio/reshapr/blob/1.1.0/proxy/src/test/java/io/reshapr/proxy/proxy/HeaderPolicyEngineTest.java), and [controllers API](https://github.com/reshaprio/reshapr-controllers/blob/0.0.4/api/src/main/java/io/reshapr/kubernetes/api/configurationplan/v1alpha1/HeaderPolicy.java) own the behavior described here.

@@ -4,6 +4,12 @@ verification:
   product: reShapr stack
   version: 1.0.0 / controllers 0.0.3
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Troubleshoot an Exposition or Proxy
@@ -14,7 +20,7 @@ Use this guide when an Exposition has no endpoint, a proxy does not receive a ch
 
 You need:
 
-- reShapr runtime `1.0.0` and, for Kubernetes-managed resources, controllers `0.0.3`;
+- reShapr runtime `1.1.0` and, for Kubernetes-managed resources, controllers `0.0.4`;
 - `reshapr login` completed for the affected organization;
 - access to proxy and operator logs;
 - `curl`, `jq`, and `kubectl` when the workload runs on Kubernetes;
@@ -93,10 +99,10 @@ For `Service`, `GatewayGroup`, `ConfigurationPlan`, `Exposition`, and `SecretSou
 
 Use `status.message` to resolve an `ERROR`. An Exposition in `IN_PROGRESS` commonly waits for its Service, ConfigurationPlan, or GatewayGroup to exist remotely. Correct the named dependency first.
 
-`CustomTools` and `Resources` use a different status shape in controllers `0.0.3`:
+`CustomTools`, `Resources`, and `Prompts` use a different status shape in controllers `0.0.4`:
 
 ```bash
-kubectl get customtools.reshapr.io,resources.reshapr.io \
+kubectl get customtools.reshapr.io,resources.reshapr.io,prompts.reshapr.io \
   --namespace "${APP_NAMESPACE}" \
   --output json | jq -r '
     .items[] |
@@ -104,7 +110,7 @@ kubectl get customtools.reshapr.io,resources.reshapr.io \
     @tsv'
 ```
 
-Controllers chart `0.0.14` packages the controllers `0.0.3` CRDs, but its default image remains `nightly` and its chart metadata still reports app version `0.0.1`. Confirm both the running image and the ConfigurationPlan schema:
+Controllers chart `0.0.15` packages the controllers `0.0.4` CRDs, but its default image remains `nightly` and its chart metadata still reports app version `0.0.1`. Confirm both the running image and the ConfigurationPlan schema:
 
 ```bash
 kubectl get deployment/reshapr-controllers-operator \
@@ -117,9 +123,9 @@ kubectl get crd configurationplans.reshapr.io \
       | {includedOperations, headerPolicy}'
 ```
 
-The image must end in `:0.0.3`, and both schema properties must be present. If the image differs, set `operator.image.tag=0.0.3` and restart the operator. If an installation upgraded from an earlier chart still has old schemas, apply the release CRDs explicitly because Helm does not upgrade them automatically. Do not apply `resources.reshapr.io` over controllers `0.0.2`: its kind changed immutably, so follow **[Upgrade reShapr and Rotate Runtime Secrets](./upgrade-and-rotate.md#upgrade-the-web-ui-and-controllers)** for that CRD.
+The image must end in `:0.0.4`, and both schema properties must be present. If the image differs, set `operator.image.tag=0.0.4` and restart the operator. If an installation upgraded from an earlier chart still has old schemas, apply the release CRDs explicitly because Helm does not upgrade them automatically. Do not apply `resources.reshapr.io` over controllers `0.0.2`: its kind changed immutably, so follow **[Upgrade reShapr and Rotate Runtime Secrets](./upgrade-and-rotate.md#upgrade-the-web-ui-and-controllers)** for that CRD.
 
-Controllers `0.0.3` use the plural `Resources` kind. If Kubernetes reports no match for `kind: Resource`, update the manifest to `kind: Resources` and confirm that the `resources.reshapr.io` CRD also reports `spec.names.kind: Resources`. The old `Unsupported artifact kind and version: Resource - reshapr.io/v1alpha1` error identifies a controllers `0.0.2` operator that still emits the singular artifact kind.
+Controllers `0.0.4` use the plural `Resources` kind. If Kubernetes reports no match for `kind: Resource`, update the manifest to `kind: Resources` and confirm that the `resources.reshapr.io` CRD also reports `spec.names.kind: Resources`. The old `Unsupported artifact kind and version: Resource - reshapr.io/v1alpha1` error identifies a controllers `0.0.2` operator that still emits the singular artifact kind.
 
 If the status does not explain the failure, inspect the operator logs:
 
@@ -203,7 +209,7 @@ curl --include --silent --show-error \
   --header 'Accept: application/json, text/event-stream' \
   --header 'MCP-Protocol-Version: 2026-07-28' \
   --header 'Mcp-Method: server/discover' \
-  --data '{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"reshapr-troubleshooting","version":"1.0.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"server/discover","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"reshapr-troubleshooting","version":"1.1.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}' \
   "${MCP_URL}"
 ```
 
@@ -233,6 +239,71 @@ Check the configured backend URL, DNS, egress policy, TLS trust, backend timeout
 Run a direct request from an approved diagnostic workload in the same network boundary when policy permits. Do not print credentials or weaken TLS to make the test pass.
 
 Recovery requires a read-only `tools/call` whose result is not marked `isError: true` and whose expected backend content is present.
+
+## Enable debug logs temporarily
+
+:::warning Sensitive diagnostic data
+Proxy DEBUG logs can contain incoming MCP headers and arguments and outgoing backend headers after credentials have been injected. Restrict access, redact credentials and personal data before sharing logs, and restore the previous level after diagnosis. Do not enable DEBUG permanently.
+:::
+
+Set `QUARKUS_LOG_CATEGORY__IO_RESHAPR_PROXY__LEVEL=DEBUG` on the proxy process, or `QUARKUS_LOG_CATEGORY__IO_RESHAPR_CTRL__LEVEL=DEBUG` on the control plane. Changing only `QUARKUS_LOG_CONSOLE_LEVEL` does not enable a category's DEBUG messages. A separately restricted console handler must also allow DEBUG.
+
+DEBUG exposes backend URLs, request headers, response statuses, and response headers, not a general dump of backend bodies. Some backend request bodies are logged at TRACE. Setting TRACE at runtime does not restore statements excluded by the image's build-time minimum log level.
+
+### Kubernetes with Helm
+
+Merge the following into a **complete copy of your proxy values**. `extraEnv` replaces the chart's list, so keep `QUARKUS_OTEL_SDK_DISABLED=true` when telemetry is intentionally disabled, or retain your existing OTLP settings instead:
+
+```yaml
+extraEnv:
+  - name: QUARKUS_OTEL_SDK_DISABLED
+    value: "true"
+  - name: QUARKUS_LOG_CATEGORY__IO_RESHAPR_PROXY__LEVEL
+    value: DEBUG
+```
+
+Upgrade the existing release with all its current settings, not just this fragment. Names below are examples:
+
+```bash
+helm upgrade '<proxy-release>' \
+  oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy \
+  --version 0.0.15 --namespace "${PROXY_NAMESPACE}" \
+  --values '<complete-proxy-values-with-debug.yaml>'
+kubectl rollout status deployment/reshapr-proxy --namespace "${PROXY_NAMESPACE}"
+kubectl logs deployment/reshapr-proxy --namespace "${PROXY_NAMESPACE}" --since 5m
+```
+
+For the control plane, use `ctrl.extraEnv` with `QUARKUS_LOG_CATEGORY__IO_RESHAPR_CTRL__LEVEL`. For the controllers, use `operator.extraEnv` or, since chart `0.0.15`, `admissionController.extraEnv`, with `QUARKUS_LOG_CATEGORY__IO_RESHAPR_KUBERNETES__LEVEL`. Keep existing list entries and pin controller images to `0.0.4`. Inspect the actual Deployment name with `kubectl get deployments` if it differs.
+
+Reproduce one failing call, collect restricted logs, then remove the temporary category entry (or restore its previous value) and repeat the upgrade. Verify the rollout and return to normal logging.
+
+### Docker Compose, including `reshapr run`
+
+The CLI has no arbitrary environment or Compose override flag. For a stack started with `reshapr run --release 1.1.0`, it caches the base file at `~/.reshapr/docker-compose-1.1.0.yml` and passes explicit `-f` arguments: a neighboring `docker-compose.override.yml` is **not** loaded automatically.
+
+Edit the cached file's existing proxy service (`gateway-01`) and add the category to its `environment` list:
+
+```yaml
+- QUARKUS_LOG_CATEGORY__IO_RESHAPR_PROXY__LEVEL=DEBUG
+```
+
+For the control-plane service, add `QUARKUS_LOG_CATEGORY__IO_RESHAPR_CTRL__LEVEL=DEBUG` instead. Preserve every other setting. Rerun the same `reshapr run --release 1.1.0` command, including `--ui` if originally used, so Compose recreates the affected container. Then read logs:
+
+```bash
+docker logs --since 5m reshapr-gateway-01
+```
+
+For a manually managed stack, edit its Compose file and run `docker compose -f '<your-compose-file.yml>' up -d`, preserving its original project name and file list. Do not expect exporting the log variable in the shell to reach the container unless the Compose file explicitly interpolates or passes it.
+
+Remove the temporary entry and rerun the same startup command to restore normal logging. Editing the cached file retains the CLI's recorded file paths, so `reshapr status` and `reshapr stop` continue to target that stack. Replacing the stack manually with a different file/project is not tracked automatically by the CLI.
+
+### Podman and standalone containers
+
+For a CLI-managed Podman stack, use the same cached-file procedure and the same original engine selection; read logs with `podman logs --since 5m reshapr-gateway-01`. For manually managed Compose, use `podman compose` with the same file/project arguments as the initial deployment. A Compose provider must be installed.
+
+For standalone `docker run` or `podman run`, add `--env QUARKUS_LOG_CATEGORY__IO_RESHAPR_PROXY__LEVEL=DEBUG` to the original launch configuration and recreate the container while preserving volumes, networking, credentials, and other options. `docker exec export ...` cannot reconfigure the running Java process. Remove the option and recreate again after diagnosis.
+
+See [Logging](../../references/logging.md) for component categories, handler thresholds, Web UI console output, and the distinction between DEBUG and TRACE. Debug logging can expose credentials; keep the warning above with any copied runbook.
 
 ## SecretSource cannot resolve a credential
 
@@ -280,12 +351,12 @@ The first failing layer now has an observable recovery check: reconciled desired
 
 - A `READY` custom resource proves control-plane reconciliation, not Gateway selection, proxy synchronization, ingress, or backend health.
 - Proxy readiness proves initial control-plane connectivity, not that every Exposition is loaded or every backend is reachable.
-- Release `1.0.0` retains the last fetched local registry during synchronization loss; this is not an offline-operation guarantee.
-- Controllers `0.0.3` do not expose one uniform status contract for all custom resources.
+- Release `1.1.0` retains the last fetched local registry during synchronization loss; this is not an offline-operation guarantee.
+- Controllers `0.0.4` do not expose one uniform status contract for all custom resources.
 - Logs and telemetry depend on the deployment's collection and retention configuration.
 
 ## Next step
 
 Use **[Observe the reShapr Proxy](./observe-and-audit.md)** to export the signals used here. Review **[Control Plane to Proxy Synchronization](../../explanations/control-plane-gateway-synchronization.md)** for the registration, streaming, heartbeat, and recovery model.
 
-The release-tagged [reShapr runtime](https://github.com/reshaprio/reshapr/tree/1.0.0) and [controllers documentation](https://github.com/reshaprio/reshapr-controllers/tree/0.0.3/documentation) remain the canonical behavioral references.
+The release-tagged [reShapr runtime](https://github.com/reshaprio/reshapr/tree/1.1.0) and [controllers documentation](https://github.com/reshaprio/reshapr-controllers/tree/0.0.4/documentation) remain the canonical behavioral references.

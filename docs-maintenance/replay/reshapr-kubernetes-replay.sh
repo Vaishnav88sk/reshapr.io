@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-RUNTIME_VERSION="${RUNTIME_VERSION:-1.0.0}"
-CONTROLLERS_VERSION="${CONTROLLERS_VERSION:-0.0.3}"
-CHART_VERSION="${CHART_VERSION:-0.0.14}"
+RUNTIME_VERSION="${RUNTIME_VERSION:-1.1.0}"
+CONTROLLERS_VERSION="${CONTROLLERS_VERSION:-0.0.4}"
+CHART_VERSION="${CHART_VERSION:-0.0.15}"
 KUBE_CONTEXT="${KUBE_CONTEXT:-reshapr-docs-rc1}"
 PLATFORM_NAMESPACE="${PLATFORM_NAMESPACE:-docs-reshapr-system}"
 WORKLOAD_NAMESPACE="${WORKLOAD_NAMESPACE:-docs-replay}"
@@ -17,14 +17,9 @@ require() {
 }
 
 require helm
-require kubectl
 require curl
 require jq
-
-[[ "$(kubectl config current-context)" == "$KUBE_CONTEXT" ]] || {
-  printf 'Refusing to use context %s; expected %s\n' "$(kubectl config current-context)" "$KUBE_CONTEXT" >&2
-  exit 1
-}
+require yq
 
 printf 'Replay baseline: reShapr %s, controllers %s, charts %s\n' \
   "$RUNTIME_VERSION" "$CONTROLLERS_VERSION" "$CHART_VERSION"
@@ -34,10 +29,10 @@ for chart in reshapr-control-plane reshapr-proxy reshapr-web-ui reshapr-controll
     --version "$CHART_VERSION" >/dev/null
 done
 
-for crd in configurationplans customtools expositions gatewaygroups resources secretsources services; do
+for crd in configurationplans customtools expositions gatewaygroups prompts resources secretsources services; do
   curl --fail --silent --show-error \
     "https://raw.githubusercontent.com/reshaprio/reshapr-controllers/${CONTROLLERS_VERSION}/deploy/crd/${crd}.reshapr.io-v1.yml" \
-    | kubectl create --dry-run=client --validate=false --filename - --output name >/dev/null
+    | CRD_NAME="${crd}.reshapr.io" yq -e '.kind == "CustomResourceDefinition" and .metadata.name == strenv(CRD_NAME) and .spec.group == "reshapr.io" and .spec.versions[0].name == "v1alpha1"' >/dev/null
 done
 
 helm template "$CONTROLLERS_RELEASE" \
@@ -68,6 +63,12 @@ if [[ "$APPLY" != true ]]; then
   exit 0
 fi
 
+require kubectl
+[[ "$(kubectl config current-context)" == "$KUBE_CONTEXT" ]] || {
+  printf 'Refusing to use context %s; expected %s\n' "$(kubectl config current-context)" "$KUBE_CONTEXT" >&2
+  exit 1
+}
+
 [[ -n "${PROXY_URL:-}" ]] || { printf 'PROXY_URL is required when APPLY=true\n' >&2; exit 1; }
 
 for release in "$CONTROL_PLANE_RELEASE" "$PROXY_RELEASE" "$CONTROLLERS_RELEASE"; do
@@ -78,7 +79,7 @@ done
   -l "app.kubernetes.io/instance=$CONTROLLERS_RELEASE" \
   -o jsonpath='{.items[0].spec.template.spec.containers[0].image}')" == *":$CONTROLLERS_VERSION" ]]
 [[ "$(kubectl get crd resources.reshapr.io -o jsonpath='{.spec.names.kind}')" == Resources ]]
-[[ "$(kubectl get crd -o json | jq '[.items[] | select(.spec.group == "reshapr.io")] | length')" == 7 ]]
+[[ "$(kubectl get crd -o json | jq '[.items[] | select(.spec.group == "reshapr.io")] | length')" == 8 ]]
 
 kubectl wait --for=jsonpath='{.status.state}'=READY resources --all \
   --namespace "$WORKLOAD_NAMESPACE" --timeout=3m

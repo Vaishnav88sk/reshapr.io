@@ -1,5 +1,11 @@
 ---
 description: Compare operation selection, Artifact selection, Custom Tools, output filters, and TOON when designing an MCP surface for agents.
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Context Control: Mechanisms and Trade-offs
@@ -61,9 +67,9 @@ These capability names are composition metadata. They help a user choose Artifac
 
 ## Treat the response after the call
 
-Use `jsonRetain` to keep only required branches, then `jsonPatches` for explicit RFC 6902 transformations. Set `compact: true` only when nulls, empty strings, empty arrays, and empty objects carry no useful domain meaning. Enable TOON only after the JSON result has the intended information and shape. In the `1.0.0` runtime, the order is fixed: retain, patch, compact, then encode.
+Use `jsonRetain` to keep only required branches, then `jsonPatches` for explicit RFC 6902 transformations. Set `compact: true` only when nulls, empty strings, empty arrays, and empty objects carry no useful domain meaning. Enable TOON only after the JSON result has the intended information and shape. In the `1.1.0` runtime, the order is fixed: retain, patch, compact, then encode.
 
-Filters fail open in `1.0.0`: if a selected filter cannot parse or transform the response, the Gateway returns the original response. This avoids replacing a successful backend call with a filtering failure, but it means filtering must not be treated as a security boundary for removing sensitive fields.
+Filters fail open in `1.1.0`: if a selected filter cannot parse or transform the response, the Gateway returns the original response. This avoids replacing a successful backend call with a filtering failure, but it means filtering must not be treated as a security boundary for removing sensitive fields.
 
 ## Three common decisions
 

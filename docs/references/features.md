@@ -4,6 +4,12 @@ verification:
   product: reShapr
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # reShapr features
@@ -22,6 +28,7 @@ verification:
 | reShapr artifacts | Available | Prompts, Resources, Custom Tools, and Tools Output Filters can be attached to a Service and selected per Configuration Plan. | [Configuration Plan and Exposition](../explanations/configuration-and-exposition.md) |
 | Declarative Custom Tools | Available | Rename, condense, or reshape existing operations without creating a new backend. | [Custom Tools specification](custom-tools-specification.md) |
 | Scripted Custom Tools | Available with limits | JavaScript orchestration can call allowed Tools with bounded execution time and depth. This extension is programmable rather than no-code. | [Custom Tools specification](custom-tools-specification.md#scripted-custom-tools) |
+| Code Mode | Available with limits | Since `1.1.0`, select `CODE` or `HYBRID` per Plan to expose `search_tools`, `get_api_types`, and `execute_code`. Client-supplied JavaScript runs under proxy guardrails; completed calls are not rolled back on failure. | [Use Code Mode](../how-to-guides/use-code-mode.md) and [flows and security boundaries](../explanations/code-mode.md) |
 | Output filtering and TOON | Available | Gateway-side rules can retain fields, apply JSON Patch, compact JSON, or encode JSON output as TOON before returning it to the MCP client. | [Tools Output Filtering](spec-outtools-filtering.md) |
 
 ## MCP protocol
@@ -34,6 +41,7 @@ verification:
 | Tools | Available | `tools/list` and `tools/call` dispatch to REST, GraphQL, gRPC, or Custom Tools selected by the Plan. | [Custom Tools specification](custom-tools-specification.md) |
 | Prompts | Available | `prompts/list` and `prompts/get` serve Prompts artifacts selected by the Plan. | [Prompts specification](prompts-specification.md) |
 | Resources | Available | Static and templated Resources support list, template list, and read operations. | [Resources specification](resources-specification.md) |
+| MCP Apps references | Available with limits | UI Resources can reference remotely hosted MCP App HTML and associate it with native Tools. Rendering requires an Apps-capable host; reShapr is not the UI hosting service. | [Reference an MCP App](../how-to-guides/reference-mcp-app.md) |
 | URL elicitation | Available with limits | Backend credentials can be requested through legacy session-bound errors or `2026-07-28` stateless elicitation bound to an authenticated user. | [Backend authentication and elicitation](../how-to-guides/security/backend-auth-and-elicitation.md) |
 | Client cache hints | Available with limits | `ttlMs` and `cacheScope` are returned only for the `2026-07-28` protocol shape. | [Configuration Plan and Exposition](../explanations/configuration-and-exposition.md) |
 
@@ -46,7 +54,7 @@ Methods such as roots, sampling, and subscriptions are not exposed as server cap
 | MCP endpoint API key | Available | The proxy validates `x-reshapr-key`; keys can be renewed and propagated to connected proxies. | [API key guide](../how-to-guides/security/api-key.md) |
 | MCP endpoint OAuth 2.0 | Available | The proxy validates signed bearer JWTs against configured issuers, JWKS, Exposition scopes, and dynamic or static audiences, and publishes RFC 9728 metadata. | [OAuth 2.0 guide](../how-to-guides/security/oauth.md) |
 | Backend authentication | Available with limits | Basic, token/header, certificate, OAuth Client Credentials, and elicited OAuth credentials depend on the backend protocol and Secret configuration. | [Backend authentication and elicitation](../how-to-guides/security/backend-auth-and-elicitation.md) |
-| Backend request header policy | Available with limits | A Configuration Plan can allow, deny, or rename request headers sent to HTTP backends or converted to gRPC call metadata. Response rules are reserved and not enforced in `1.0.0`. | [Configure backend request header policy](../how-to-guides/security/configure-backend-header-policy.md) |
+| Backend request header policy | Available with limits | A Configuration Plan can allow, deny, or rename request headers sent to HTTP backends or converted to gRPC call metadata. Response rules are reserved and not enforced in `1.1.0`. | [Configure backend request header policy](../how-to-guides/security/configure-backend-header-policy.md) |
 | Database encryption and key rotation | Available with limits | The control plane uses identified AES-256-GCM keys and can re-encrypt stored sensitive values with the active key through an administrator command. Key rollout and invocation remain operator-managed. | [Upgrade and rotate runtime secrets](../how-to-guides/operations/upgrade-and-rotate.md) |
 | Local secret references | Available with limits | Hybrid proxies resolve `${env:VARIABLE}` references locally on each backend call. `env` is the provided resolver. | [Backend authentication and elicitation](../how-to-guides/security/backend-auth-and-elicitation.md#create-a-locally-resolved-secret) |
 | Audit events | Available with limits | A proxy emits structured MCP-call and authentication-failure events when audit is enabled on the Configuration Plan. | [Audit MCP endpoint calls](../how-to-guides/audit-mcp-endpoint.md) |
@@ -69,7 +77,7 @@ Methods such as roots, sampling, and subscriptions are not exposed as server cap
 | Capability | Availability | Scope | Reference |
 |---|---|---|---|
 | Local runtime | Available | The CLI starts and stops a release Docker Compose stack with Docker or Podman and can include the Web UI. | [reShapr project](https://github.com/reshaprio/reshapr) |
-| Kubernetes APIs and operator | Available with limits | Seven `v1alpha1` CRDs manage Services, Plans, Expositions, Gateway Groups, Secret sources, Custom Tools, and Resources. Custom Tools and Resources do not currently clean up remote artifacts on deletion. | [Controller documentation](https://github.com/reshaprio/reshapr-controllers/tree/main/documentation) |
+| Kubernetes APIs and operator | Available with limits | Eight `v1alpha1` CRDs manage Services, Plans, Expositions, Gateway Groups, Secret sources, Custom Tools, Resources, and Prompts. Artifact CRs have filename-collision and remote-cleanup limits. | [Kubernetes APIs and Controllers](./kubernetes-apis.md) |
 | Sidecar injection | Available with limits | The admission controller injects Gateway sidecars and creates discovery/MCP Services for supported Deployment-owned workloads. It is fail-open by default. | [Admission controller](https://github.com/reshaprio/reshapr-controllers/blob/main/documentation/admission-controller.md) |
 | Helm packaging | Available | Four OCI charts package the control plane, proxy, Web UI, and controllers. | [Helm charts](https://github.com/reshaprio/reshapr-helm-charts) |
 | PostgreSQL topology | Available with limits | The control-plane chart supports bundled or external PostgreSQL. The bundled development database is not a high-availability setup. | [Control-plane chart](https://github.com/reshaprio/reshapr-helm-charts/tree/main/control-plane) |

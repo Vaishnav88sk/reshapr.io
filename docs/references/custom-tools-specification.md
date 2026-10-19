@@ -1,5 +1,11 @@
 ---
 description: Define Custom Tools to rename, condense, and translate default API operations into LLM-friendly MCP tools.
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Custom Tools
@@ -63,7 +69,7 @@ In the case of custom tools using `arguments`, the value **can** be expressed us
 
 ## Scripted Custom Tools
 
-Available since reShapr `0.0.14`, a Custom Tool can also define its behavior with a JavaScript `script`. This is useful when a single business action needs to orchestrate several existing tools, possibly from different Services of the same organization, and return a compact result that is easier for an Agent to use.
+Available since reShapr `0.0.15`, a Custom Tool can also define its behavior with a JavaScript `script`. This is useful when a single business action needs to orchestrate several existing tools, possibly from different Services of the same organization, and return a compact result that is easier for an Agent to use.
 
 Use **[Build a Scripted Custom Tool](../how-to-guides/build-scripted-custom-tool.md)** for an end-to-end procedure covering cross-Service calls, asynchronous orchestration, failures, and runtime guardrails.
 
@@ -92,7 +98,7 @@ The `tools` array is both a security allow-list and the input used by reShapr to
 ```yaml
 tools:
   - tool: user
-  - service: "Issues API:1.0.0"
+  - service: "Issues API:1.1.0"
     tool: listIssues
 ```
 
@@ -178,8 +184,9 @@ Script execution is bounded by gateway settings:
 | `reshapr.gateway.scripting.timeout` | `10000` ms | Maximum script execution time. `0` disables the timeout. |
 | `reshapr.gateway.scripting.max-tool-calls` | `10` | Maximum number of tool calls per script execution. |
 | `reshapr.gateway.scripting.max-depth` | `5` | Maximum nesting depth when a scripted tool calls another scripted tool. |
+| `reshapr.gateway.scripting.max-memory-pages` | `256` | Maximum WebAssembly linear-memory pages (64 KiB each), or 16 MiB per sandbox by default. Not a limit on total gateway memory. |
 
-The timeout cancels interruptible work such as backend calls and waits. Keep scripts simple and avoid unbounded CPU loops.
+The release bounds script execution, including CPU-only work, as well as interruptible backend calls and waits. Keep scripts bounded and account for concurrent sandboxes. See [Runtime environment variables](./environment-variables.md#code-mode-and-script-guardrails) for exact environment names, units, and the separate Code Mode limits. Code Mode and Scripted Custom Tools share nesting and memory settings but have separate timeout and call-count settings.
 
 Artifact validation rejects a declarative tool without `arguments`, a placeholder that is absent from `input.properties`, and a reference to a Tool that cannot be resolved. Compilation failures are returned without exposing the generated wrapper source.
 

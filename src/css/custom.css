@@ -1929,6 +1929,29 @@ html.docs-doc-page .theme-doc-markdown.markdown table {
   font-size: 0.98em;
 }
 
+html[class~='docs-doc-id-references/environment-variables'] .theme-doc-markdown.markdown table {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+html[class~='docs-doc-id-references/environment-variables'] .theme-doc-markdown.markdown table :is(th, td):first-child {
+  width: 36%;
+}
+
+html[class~='docs-doc-id-references/environment-variables'] .theme-doc-markdown.markdown table :is(th, td):nth-child(2) {
+  width: 18%;
+}
+
+html[class~='docs-doc-id-references/environment-variables'] .theme-doc-markdown.markdown table :is(th, td) {
+  overflow-wrap: anywhere;
+}
+
+html[class~='docs-doc-id-references/environment-variables'] .theme-doc-markdown.markdown table code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
 [data-theme='dark'] html.docs-doc-page .theme-doc-markdown.markdown h1 + p {
   color: color-mix(in srgb, var(--ifm-font-color-base) 88%, var(--palette-muted));
 }

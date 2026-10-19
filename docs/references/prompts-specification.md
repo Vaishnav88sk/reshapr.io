@@ -1,5 +1,11 @@
 ---
 description: Define MCP Prompts using YAML to provide accelerators, guardrails, and orchestration instructions for tool usage.
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Prompts
@@ -19,7 +25,7 @@ apiVersion: reshapr.io/v1alpha1
 kind: Prompts
 service:
   name: Petstore
-  version: 1.0.0
+  version: 1.1.0
 prompts:
   list_pets:
     title: List the pets

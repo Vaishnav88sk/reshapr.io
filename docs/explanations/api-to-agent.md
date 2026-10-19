@@ -1,5 +1,11 @@
 ---
 description: Follow an API contract through import, MCP capability selection, Tool dispatch, response filtering, and delivery to an agent.
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # From API Contract to Agent Action
@@ -56,7 +62,7 @@ The proxy validates the requested Tool and arguments, maps the call to the REST,
 
 ## 6. Response treatment happens before MCP delivery
 
-A selected output filter can retain JSON branches, apply JSON Patch operations, remove recursively empty values, and encode the resulting data as TOON. For the `1.0.0` baseline, these stages run in that order:
+A selected output filter can retain JSON branches, apply JSON Patch operations, remove recursively empty values, and encode the resulting data as TOON. For the `1.1.0` baseline, these stages run in that order:
 
 ```text
 backend JSON -> jsonRetain -> jsonPatches -> compact (optional) -> TOON (optional) -> MCP Tool result

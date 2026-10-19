@@ -1,5 +1,11 @@
 ---
 description: Find the canonical reShapr API, CLI, Kubernetes, and Helm interfaces without duplicating their owner documentation.
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Product Interfaces
@@ -19,13 +25,15 @@ The [`reshapr`](https://github.com/reshaprio/reshapr) repository owns the contro
 | Interface | Purpose | Current contract |
 |---|---|---|
 | Public API | Manage Services, artifacts, Configuration Plans, Expositions, Secrets, Gateway Groups, and API tokens | [Public OpenAPI](https://github.com/reshaprio/reshapr/blob/main/reshapr-public-openapi-v0.1.yaml) |
-| Administration API | Manage users, organizations, memberships, quotas, and service accounts | [Admin OpenAPI](https://github.com/reshaprio/reshapr/blob/main/reshapr-admin-ctrl-openapi-v0.1.yaml), [organization guide](../how-to-guides/administration/organizations-and-memberships.md), and [quota guide](../how-to-guides/administration/organization-quotas.md) |
-| Authentication API | Authenticate users and establish CLI or browser sessions | [Authentication OpenAPI](https://github.com/reshaprio/reshapr/blob/main/reshapr-authentication-openapi-v0.1.yaml) |
+| Administration API | Manage users, organizations, memberships, quotas, and service accounts | [Admin OpenAPI](https://github.com/reshaprio/reshapr/blob/main/reshapr-admin-ctrl-openapi.yaml), [organization guide](../how-to-guides/administration/organizations-and-memberships.md), and [quota guide](../how-to-guides/administration/organization-quotas.md) |
+| Authentication API | Authenticate users and establish CLI or browser sessions | [Authentication OpenAPI](https://github.com/reshaprio/reshapr/blob/main/reshapr-authentication-openapi.yaml) |
+
+Since the [contract metadata update](https://github.com/reshaprio/reshapr/commit/8dd58e3edf70db8c12432028570cbd5470c38cbe), all three current contracts declare API version `1.1` (`info.version`) and use the OpenAPI `3.0.2` format. The public contract still has the historical `-v0.1` filename suffix; that suffix does not identify its declared API version. Release-specific guides retain the filenames and metadata present at their release tags rather than applying these default-branch renames retroactively.
 
 ## MCP interface
 
 - **[MCP Compatibility](../explanations/mcp-compatibility.md)** explains session-based and stateless negotiation, state, response dialects, and elicitation.
-- **[MCP Support Matrix](./mcp-support.md)** records the exact versions and server methods verified for reShapr `1.0.0`.
+- **[MCP Support Matrix](./mcp-support.md)** records the exact versions and server methods verified for reShapr `1.1.0`.
 - **[MCP implementation](https://github.com/reshaprio/reshapr/tree/main/proxy/src/main/java/io/reshapr/proxy/mcp)** is the current owner for Gateway protocol behavior.
 - **[Official MCP specification](https://modelcontextprotocol.io/specification/)** owns the protocol beyond reShapr's implementation boundary.
 
@@ -42,7 +50,7 @@ Use `reshapr --help` or `reshapr <command> --help` for the command set installed
 
 ## Kubernetes APIs
 
-- **[Kubernetes APIs and Controllers](./kubernetes-apis.md)** orients readers across the operator, admission webhook, and seven custom resources.
+- **[Kubernetes APIs and Controllers](./kubernetes-apis.md)** orients readers across the operator, admission webhook, and eight custom resources.
 - **[Controllers documentation](https://github.com/reshaprio/reshapr-controllers/tree/main/documentation)** owns installation and per-resource references.
 - **[Generated CRD schemas](https://github.com/reshaprio/reshapr-controllers/tree/main/deploy/crd)** are the current Kubernetes contracts.
 

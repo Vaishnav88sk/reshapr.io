@@ -6,7 +6,7 @@ These private scripts retain the repeatable parts of release verification. They 
 
 | Script | Default check | Optional live check |
 |---|---|---|
-| `reshapr-kubernetes-replay.sh` | Pull all three Helm charts, validate the seven tagged CRDs, and render the controllers chart with a pinned image | With `APPLY=true`, inspect an existing isolated deployment and call MCP `resources/list` |
+| `reshapr-kubernetes-replay.sh` | Pull all four Helm charts, validate the eight tagged CRDs, and render the charts with pinned images | With `APPLY=true`, inspect an existing isolated deployment and call MCP `resources/list` |
 | `reshapr-hybrid-replay.sh` | Verify the released proxy image exists | With `APPLY=true`, start a temporary proxy, verify readiness, discovery, and `tools/list`, then remove it |
 | `reshapr-observability-replay.sh` | Render the proxy chart with OTLP and ServiceMonitor settings and validate the resulting resources | With `APPLY=true`, inspect a deployed proxy and query a caller-supplied metrics URL |
 

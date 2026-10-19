@@ -24,9 +24,9 @@ git -C ../reshapr-controllers rev-parse HEAD
 git -C ../reshapr-helm-charts rev-parse HEAD
 git rev-parse HEAD
 
-git -C ../reshapr rev-list -n 1 0.2.3
-git -C ../reshapr-controllers rev-list -n 1 0.0.1
-git -C ../reshapr-helm-charts ls-remote --tags origin refs/tags/0.0.11
+git -C ../reshapr rev-list -n 1 1.1.0
+git -C ../reshapr-controllers rev-list -n 1 0.0.4
+git -C ../reshapr-helm-charts ls-remote --tags origin refs/tags/0.0.15
 ```
 
 Replace the versions with the refs under review. Use `git ls-remote` when an immutable published tag is absent from a local clone; do not fetch or change another working tree merely to record its commit.
@@ -127,7 +127,7 @@ For every changed `CAP-*` and `LIM-*` ID, update [`coverage-matrix.md`](coverage
 - use `partial` and name the exact gap instead of creating placeholder prose;
 - use `missing` when a released capability has no meaningful page;
 - use `not-documentable` for unsupported behavior, while retaining boundary mentions that prevent overclaiming;
-- update the 52-page corpus inventory when pages are added, moved, or removed;
+- update the authored corpus inventory when pages are added, moved, or removed;
 - preserve published URLs with redirects or aliases when content moves;
 - reassess persona entry points when a journey changes.
 

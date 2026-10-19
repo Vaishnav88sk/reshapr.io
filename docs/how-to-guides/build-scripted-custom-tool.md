@@ -4,6 +4,12 @@ verification:
   product: reShapr
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Build a Scripted Custom Tool
@@ -46,7 +52,7 @@ Use this pattern when the sequence represents a reusable business action. Keep o
 
 ## Prerequisites
 
-- reShapr CLI `1.0.0`, authenticated against reShapr Online or a local `1.0.0` environment
+- reShapr CLI `1.1.0`, authenticated against reShapr Online or a local `1.1.0` environment
 - `curl` and `jq`
 - Docker Compose v2 when testing the timeout override on the local stack
 - A running proxy registered as a Gateway in Gateway Group `1`
@@ -68,11 +74,11 @@ Locate the generated Services using structured CLI output:
 ```bash
 TODOS_SERVICE_ID="$(
   reshapr service list --output json \
-    | jq -er 'map(select(.name == "Scripted Todos API" and .version == "1.0.0")) | first | .id'
+    | jq -er 'map(select(.name == "Scripted Todos API" and .version == "1.1.0")) | first | .id'
 )"
 USERS_SERVICE_ID="$(
   reshapr service list --output json \
-    | jq -er 'map(select(.name == "Scripted Users API" and .version == "1.0.0")) | first | .id'
+    | jq -er 'map(select(.name == "Scripted Users API" and .version == "1.1.0")) | first | .id'
 )"
 export TODOS_SERVICE_ID USERS_SERVICE_ID
 ```
@@ -98,7 +104,7 @@ reshapr expo create \
   --gateway-group 1
 ```
 
-The Exposition makes `Scripted Users API:1.0.0` resolvable by scripts running in the same organization. It does not expose that Service to scripts in another organization.
+The Exposition makes `Scripted Users API:1.1.0` resolvable by scripts running in the same organization. It does not expose that Service to scripts in another organization.
 
 ## Attach the scripted Artifact
 
@@ -107,7 +113,7 @@ Review the complete **[Scripted Custom Tool Artifact](/examples/scripted-custom-
 ```yaml
 tools:
   - tool: get_todos_todoid
-  - service: Scripted Users API:1.0.0
+  - service: Scripted Users API:1.1.0
     tool: get_users_userid
 ```
 
@@ -193,7 +199,7 @@ call_tool() {
         arguments: $arguments,
         _meta: {
           "io.modelcontextprotocol/protocolVersion": "2026-07-28",
-          "io.modelcontextprotocol/clientInfo": {name: "reshapr-docs", version: "1.0.0"},
+          "io.modelcontextprotocol/clientInfo": {name: "reshapr-docs", version: "1.1.0"},
           "io.modelcontextprotocol/clientCapabilities": {}
         }
       }
@@ -218,7 +224,7 @@ curl --silent --show-error \
   --header 'Accept: application/json, text/event-stream' \
   --header 'MCP-Protocol-Version: 2026-07-28' \
   --header 'Mcp-Method: tools/list' \
-  --data '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"reshapr-docs","version":"1.0.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{"_meta":{"io.modelcontextprotocol/protocolVersion":"2026-07-28","io.modelcontextprotocol/clientInfo":{"name":"reshapr-docs","version":"1.1.0"},"io.modelcontextprotocol/clientCapabilities":{}}}}' \
   "$MCP_URL" | jq -r '.result.tools[].name'
 ```
 
@@ -263,7 +269,7 @@ The returned object has `blocked: true` and an invalid-parameters error naming t
 
 ### Maximum Tool calls
 
-The `1.0.0` default permits 10 underlying Tool calls per script execution. The diagnostic Tool attempts 11:
+The `1.1.0` default permits 10 underlying Tool calls per script execution. The diagnostic Tool attempts 11:
 
 ```bash
 call_tool 'exceed_call_limit' '{}' \

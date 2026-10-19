@@ -117,6 +117,16 @@ const sidebars = {
               id: 'how-to-guides/build-scripted-custom-tool',
               label: 'Build a Scripted Custom Tool',
             },
+            {
+              type: 'doc',
+              id: 'how-to-guides/use-code-mode',
+              label: 'Use Code Mode',
+            },
+            {
+              type: 'doc',
+              id: 'how-to-guides/reference-mcp-app',
+              label: 'Reference an MCP App',
+            },
           ],
         },
         {
@@ -296,6 +306,11 @@ const sidebars = {
             },
             {
               type: 'doc',
+              id: 'explanations/code-mode',
+              label: 'Code Mode: Flows and Security',
+            },
+            {
+              type: 'doc',
               id: 'explanations/mcp-compatibility',
               label: 'MCP Compatibility',
             },
@@ -374,6 +389,16 @@ const sidebars = {
               type: 'doc',
               id: 'references/helm-charts',
               label: 'Helm Charts',
+            },
+            {
+              type: 'doc',
+              id: 'references/environment-variables',
+              label: 'Runtime Environment Variables',
+            },
+            {
+              type: 'doc',
+              id: 'references/logging',
+              label: 'Logging',
             },
           ],
         },

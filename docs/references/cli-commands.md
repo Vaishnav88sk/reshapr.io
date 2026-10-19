@@ -4,6 +4,12 @@ verification:
   product: reShapr CLI
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # reShapr CLI Reference
@@ -327,7 +333,7 @@ Then, depending on your Secret's nature, you will have to use one or more of the
 - `-h, --tokenHeader <tokenHeader>` : When using token or API key-based authentication, the token header will allow you to customize the HTTP header used to send the token value.
 - `-c, --certificate <path>` : When accessing a TLS-secured endpoint, you may want to provide your specific X509 certificate using the PEM format.
 
-Since reShapr `0.0.14`, sensitive backend Secret values can be literal values or **[secret references](../explanations/security-model.md#secret-references)** such as `${env:GITHUB_TOKEN}`. In that case, the control plane stores the reference, and the Gateway resolves the actual value locally when calling the backend endpoint.
+Since reShapr `0.0.15`, sensitive backend Secret values can be literal values or **[secret references](../explanations/security-model.md#secret-references)** such as `${env:GITHUB_TOKEN}`. In that case, the control plane stores the reference, and the Gateway resolves the actual value locally when calling the backend endpoint.
 
 Below is an example of a secret creation:
 
@@ -560,7 +566,7 @@ Request-header propagation can be configured on `config create` and `config crea
 
 - `--reqhp, --requestHeaderPolicy <json>`: Allow, deny, or rename request headers. A rename is expressed as `"Source:Target"` in the `rename` array.
 - `--passthrough`: Allow the incoming `Authorization` header to reach the backend. This shortcut is mutually exclusive with `--requestHeaderPolicy` and is not recommended outside bounded development or debugging.
-- `--reshp, --responseHeaderPolicy <json>`: Store response rules for forward compatibility. Runtime `1.0.0` does not enforce them.
+- `--reshp, --responseHeaderPolicy <json>`: Store response rules for forward compatibility. Runtime `1.1.0` does not enforce them.
 
 ```bash
 reshapr config create backend-header-policy \
@@ -987,7 +993,7 @@ Rotation is idempotent and reports the numbers of Secret and Configuration Plan 
 
 ## Shell completion
 
-Release `1.0.0` provides generated shell completion through `reshapr completion`. Run `reshapr completion --help` to select and install the script for the current shell; completion itself does not require an authenticated session.
+Release `1.1.0` provides generated shell completion through `reshapr completion`. Run `reshapr completion --help` to select and install the script for the current shell; completion itself does not require an authenticated session.
 
 ## Structured output
 

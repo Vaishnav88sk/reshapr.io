@@ -4,6 +4,12 @@ verification:
   product: reShapr
   version: 1.0.0
   date: 2026-09-22
+release_review:
+  runtime: 1.1.0
+  controllers: 0.0.4
+  charts: 0.0.15
+  date: 2026-10-19
+  scope: release-tagged source review; not a live command replay
 ---
 
 # Assign and Monitor Organization Quotas
@@ -16,9 +22,9 @@ Quotas restrict resource counts. They do not rate-limit MCP requests or reserve 
 
 You need:
 
-- a reShapr `1.0.0` control plane and the name of an existing organization;
+- a reShapr `1.1.0` control plane and the name of an existing organization;
 - the deployment-wide administration API key;
-- reShapr CLI `1.0.0` for the CLI path;
+- reShapr CLI `1.1.0` for the CLI path;
 - a deployed Web UI configured with its server-side administration API key for the Web UI path;
 - `curl` and `jq` for the API path;
 - a normal user session with membership in the target organization to perform the tenant-side verification.
@@ -251,4 +257,4 @@ When an enabled quota reaches zero remaining, the corresponding create or first-
 
 Use **[Automate reShapr with the CLI in CI/CD](../automate-with-cli-in-cicd.md)** to place quota checks around resource automation. Review **[Product Interfaces](../../references/interfaces.md)** to choose the canonical API or CLI reference for a deeper integration.
 
-The release-tagged [administration API contract](https://github.com/reshaprio/reshapr/blob/1.0.0/reshapr-admin-ctrl-openapi-v0.1.yaml), [administrative CLI guide](https://github.com/reshaprio/reshapr/blob/1.0.0/cli/ADMIN_CLI.md), and [Web UI implementation](https://github.com/reshaprio/reshapr/tree/1.0.0/web-ui) remain the canonical interface references.
+The release-tagged [administration API contract](https://github.com/reshaprio/reshapr/blob/1.1.0/reshapr-admin-ctrl-openapi-v0.1.yaml), [administrative CLI guide](https://github.com/reshaprio/reshapr/blob/1.1.0/cli/ADMIN_CLI.md), and [Web UI implementation](https://github.com/reshaprio/reshapr/tree/1.1.0/web-ui) remain the canonical interface references.
