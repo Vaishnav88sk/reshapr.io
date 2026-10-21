@@ -2,8 +2,8 @@
 description: Attach Prompts, Resources, Custom Tools, and output filters to a Service, then expose different Artifact selections through separate Plans.
 verification:
   product: reShapr
-  version: 1.0.0
-  date: 2026-09-22
+  version: 1.1.0
+  date: 2026-10-20
 release_review:
   runtime: 1.1.0
   controllers: 0.0.4
@@ -164,6 +164,8 @@ CONTEXT_MCP_URL="${MCP_SCHEME}://$(
 )"
 export ACTION_MCP_URL CONTEXT_MCP_URL
 ```
+
+If these endpoints return `404` while `reshapr expo get` lists them, inspect the proxy's discovery stream before changing the Plans. A stream interruption during the `1.1.0` replay required a controlled proxy restart; see **[Proxy did not receive a recent change](./operations/troubleshoot.md#proxy-did-not-receive-a-recent-change)**.
 
 ## Compare the exposed capabilities
 

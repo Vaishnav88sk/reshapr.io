@@ -34,7 +34,7 @@ The `reshapr` CLI is an NPM package available at **[https://www.npmjs.com/packag
 We recommend installing the CLI with anonymous usage telemetry enabled:
 
 ```bash
-npm install -g @reshapr/reshapr-cli --allow-scripts=@scarf/scarf
+npm install -g @reshapr/reshapr-cli@1.1.0 --allow-scripts=@scarf/scarf
 ```
 
 The `--allow-scripts=@scarf/scarf` option explicitly authorizes Scarf's installation telemetry script. These anonymous metrics help the community measure adoption and support the project's future donation to the **[Agentic AI Foundation (AAIF)](https://aaif.io/)**.
@@ -44,7 +44,7 @@ Telemetry is optional. **[Learn why we collect these metrics](https://github.com
 To install the CLI without enabling telemetry, use:
 
 ```bash
-npm install -g @reshapr/reshapr-cli
+npm install -g @reshapr/reshapr-cli@1.1.0
 ```
 
 The CLI remains fully functional when telemetry is not enabled.

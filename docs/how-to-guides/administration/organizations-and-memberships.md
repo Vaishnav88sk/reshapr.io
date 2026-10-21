@@ -173,16 +173,14 @@ The operation returns `409 Conflict` when the organization name already exists.
 
 ### Assign or replace the owner
 
-The owner API expects the username as a JSON string:
+The owner API expects the raw username as a text body, without JSON quotes:
 
 ```bash
-OWNER_REQUEST="$(jq -Rn --arg username "${OWNER_USERNAME}" '$username')"
-
 curl --fail --silent --show-error \
   --config "${RESHAPR_CURL_CONFIG}" \
   --request PUT \
-  --header 'Content-Type: application/json' \
-  --data "${OWNER_REQUEST}" \
+  --header 'Content-Type: text/plain' \
+  --data "${OWNER_USERNAME}" \
   "${RESHAPR_SERVER}/api/admin/organizations/${RESHAPR_ORGANIZATION}/owner" \
   | jq -e \
       --arg organization "${RESHAPR_ORGANIZATION}" \

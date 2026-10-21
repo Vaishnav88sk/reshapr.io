@@ -187,6 +187,16 @@ kubectl logs deployment/reshapr-proxy \
 
 An initialized proxy keeps the last configuration it fetched while synchronization is unavailable. During that interval, new or updated Expositions can be absent and deleted ones can remain locally.
 
+During a `1.1.0` Compose replay, the log message `Exposition changes stream has been terminated` coincided with newly created endpoints returning `404`, even though control-plane endpoints were listed and proxy readiness was `UP`. Restarting the affected local proxy restored discovery. Preserve the logs first; for the release-owned local Compose stack, restart only that service and wait for readiness:
+
+```bash
+docker compose --file "$HOME/.reshapr/docker-compose-1.1.0.yml" restart gateway-01
+docker compose --file "$HOME/.reshapr/docker-compose-1.1.0.yml" \
+  up --detach --wait --wait-timeout 180
+```
+
+This is a recovery step, not a guarantee of uninterrupted live propagation. Repeat MCP discovery after the restart.
+
 Restore proxy-to-control-plane connectivity and wait for stream retry or health-triggered re-registration. If the process cannot recover, perform a controlled rollout after preserving its logs:
 
 ```bash

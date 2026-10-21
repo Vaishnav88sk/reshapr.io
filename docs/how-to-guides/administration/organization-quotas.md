@@ -119,7 +119,7 @@ Unset the key when the administration step is complete:
 unset RESHAPR_ADMIN_API_KEY
 ```
 
-The CLI command uses the standard assignment API. New quota records start with `remaining` equal to `limit`. Updating an existing record changes `enabled` and `limit`, but increasing its limit does not increase its existing `remaining` value. Use the Web UI or the controlled API procedure below when increasing a limit must make the additional capacity immediately available.
+The CLI command uses the standard assignment API. New quota records start with `remaining` equal to `limit`. In `1.1.0`, updating an existing record preserves consumed units and recalculates `remaining` from the new limit, clamped between zero and that limit. For example, changing a limit from `10` to `15` with `3` remaining produces `8` remaining. No force operation is needed for an ordinary limit change.
 
 ## Manage quotas with the administration API
 
@@ -172,9 +172,9 @@ curl --fail --silent --show-error \
 
 Set `enabled` to `false` for an assigned metric to stop enforcing it. Disabling a quota does not delete resources or reset its stored counters.
 
-### Increase a limit while preserving consumption
+### Override remaining capacity explicitly
 
-The `/force` operation accepts an explicit `remaining` value. Calculate it from the current quota rather than guessing or resetting it to the new limit. This example increases `exposition.count` to `20` while preserving represented consumption:
+Use the standard assignment above for routine limit changes. The `/force` operation bypasses that calculation and accepts an explicit `remaining` value, for example during a reviewed accounting repair. Re-read the current quota immediately before calculating the override and serialize concurrent changes. This example preserves represented consumption while setting `exposition.count` to `20`:
 
 ```bash
 export QUOTA_METRIC='exposition.count'
@@ -209,7 +209,7 @@ curl --fail --silent --show-error \
   | jq .
 ```
 
-The force endpoint directly sets `remaining`. Restrict its use to administration code that first reads the current state and preserves the intended consumption. The Web UI performs this calculation when saving changes.
+The force endpoint directly sets `remaining`. Restrict its use to administration code that first reads the current state and preserves the intended consumption.
 
 ## Verify from the organization context
 
@@ -249,7 +249,7 @@ When an enabled quota reaches zero remaining, the corresponding create or first-
 - The administration API key is global to the deployment, not scoped to the target organization.
 - Quotas count resources; they do not provide request throttling, infrastructure reservations, or availability guarantees.
 - Assigning or lowering a quota does not delete existing resources.
-- The standard CLI and API update does not add to `remaining` when an existing limit is raised.
+- The standard CLI and API update preserves consumed units when a limit changes; it does not recount existing resources.
 - The force API trusts the supplied `remaining` value and can make accounting inconsistent when callers do not preserve current consumption.
 - Omitting a metric from an assignment leaves its existing quota unchanged.
 

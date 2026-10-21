@@ -78,7 +78,7 @@ Reduce and reshape a GitHub GraphQL API into focused MCP capabilities.
       <p class="youtube-demo-meta">Published May 5, 2026 · 2 minutes 2 seconds · Version not stated</p>
       <p><strong>Prerequisite:</strong> a GitHub GraphQL service imported into reShapr.</p>
       <p><strong>Result:</strong> the exposed MCP surface contains only task-relevant capabilities.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/tutorials/context-control-in-practice">Written alternative</a> · <a href="https://youtu.be/OjsSAt0JdOY" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>
@@ -92,7 +92,7 @@ Reduce and reshape a GitHub GraphQL API into focused MCP capabilities.
       <p class="youtube-demo-meta">Published May 12, 2026 · 1 minute 4 seconds · Version not stated</p>
       <p><strong>Prerequisite:</strong> an exposed GitHub GraphQL service.</p>
       <p><strong>Result:</strong> an MCP Prompt guides a client through the focused workflow.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/references/prompts-specification">Written alternative</a> · <a href="https://youtu.be/VONwzZ55Jvc" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>
@@ -106,7 +106,7 @@ Reduce and reshape a GitHub GraphQL API into focused MCP capabilities.
       <p class="youtube-demo-meta">Published May 13, 2026 · 45 seconds · Version not stated</p>
       <p><strong>Prerequisite:</strong> a GitHub GraphQL MCP endpoint and a compatible MCP App.</p>
       <p><strong>Result:</strong> the app consumes the focused capabilities exposed by reShapr.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/tutorials/context-control-in-practice">Written alternative</a> · <a href="https://youtu.be/5ewU51_oM_8" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>
@@ -120,7 +120,7 @@ Reduce and reshape a GitHub GraphQL API into focused MCP capabilities.
       <p class="youtube-demo-meta">Published May 27, 2026 · 2 minutes · Version not stated</p>
       <p><strong>Prerequisite:</strong> an exposed GitHub GraphQL service with a Prompt Artifact.</p>
       <p><strong>Result:</strong> the MCP App uses a Prompt to drive the focused workflow.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/references/prompts-specification">Written alternative</a> · <a href="https://youtu.be/PVfznWFvKTI" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>
@@ -140,7 +140,7 @@ Keep MCP client authentication separate from the credentials used by the proxy t
       <p class="youtube-demo-meta">Published June 9, 2026 · 1 minute 47 seconds · Version not stated</p>
       <p><strong>Prerequisite:</strong> a GitHub token and an MCP client that supports elicitation.</p>
       <p><strong>Result:</strong> the proxy receives a credential for authenticated backend calls.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/how-to-guides/security/backend-auth-and-elicitation">Written alternative</a> · <a href="https://youtu.be/y38__Uj5gWo" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>
@@ -154,7 +154,7 @@ Keep MCP client authentication separate from the credentials used by the proxy t
       <p class="youtube-demo-meta">Published June 25, 2026 · 1 minute 57 seconds · Version not stated</p>
       <p><strong>Prerequisite:</strong> Keycloak, Open-Meteo, and an MCP client with URL elicitation support.</p>
       <p><strong>Result:</strong> the proxy obtains OAuth credentials for backend access.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/how-to-guides/security/backend-auth-and-elicitation">Written alternative</a> · <a href="https://youtu.be/dC41-ieQIqk" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>
@@ -168,7 +168,7 @@ Keep MCP client authentication separate from the credentials used by the proxy t
       <p class="youtube-demo-meta">Published August 5, 2026 · 1 minute 30 seconds · MCP 2026-07-28</p>
       <p><strong>Prerequisite:</strong> OAuth providers for the MCP endpoint and backend API.</p>
       <p><strong>Result:</strong> client authentication and backend authorization use separate flows.</p>
-      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.0.0.</p>
+      <p class="youtube-demo-status">Reference demo · Replay not verified against current baseline reShapr 1.1.0.</p>
       <p><a href="/docs/how-to-guides/security/backend-auth-and-elicitation">Written alternative</a> · <a href="https://youtu.be/_DTf34OaLr0" target="_blank" rel="noopener noreferrer">Watch video</a></p>
     </div>
   </article>

@@ -74,11 +74,11 @@ Locate the generated Services using structured CLI output:
 ```bash
 TODOS_SERVICE_ID="$(
   reshapr service list --output json \
-    | jq -er 'map(select(.name == "Scripted Todos API" and .version == "1.1.0")) | first | .id'
+    | jq -er 'map(select(.name == "Scripted Todos API" and .version == "1.0.0")) | first | .id'
 )"
 USERS_SERVICE_ID="$(
   reshapr service list --output json \
-    | jq -er 'map(select(.name == "Scripted Users API" and .version == "1.1.0")) | first | .id'
+    | jq -er 'map(select(.name == "Scripted Users API" and .version == "1.0.0")) | first | .id'
 )"
 export TODOS_SERVICE_ID USERS_SERVICE_ID
 ```
@@ -104,7 +104,7 @@ reshapr expo create \
   --gateway-group 1
 ```
 
-The Exposition makes `Scripted Users API:1.1.0` resolvable by scripts running in the same organization. It does not expose that Service to scripts in another organization.
+The Exposition makes `Scripted Users API:1.0.0` resolvable by scripts running in the same organization. The example contract version is independent of the reShapr runtime version. It does not expose that Service to scripts in another organization.
 
 ## Attach the scripted Artifact
 
@@ -113,7 +113,7 @@ Review the complete **[Scripted Custom Tool Artifact](/examples/scripted-custom-
 ```yaml
 tools:
   - tool: get_todos_todoid
-  - service: Scripted Users API:1.1.0
+  - service: Scripted Users API:1.0.0
     tool: get_users_userid
 ```
 
@@ -135,11 +135,10 @@ The `tools` list is an execution allow-list for the script. It does not grant OA
 
 ## Expose the scripted Tools
 
-Create a Todos Plan that selects the Artifact, its four scripted capabilities, and the generated operation called by the same-Service script:
+Create a Todos Plan that selects the Artifact and its four scripted capabilities. The primitive operation remains hidden from MCP clients:
 
 ```bash
 SCRIPTED_TOOLS='[
-  "GET /todos/{todoId}",
   "inspect_todo_and_owner",
   "probe_undeclared_tool",
   "exceed_call_limit",
@@ -168,7 +167,7 @@ export TODOS_MCP_ENDPOINT
 unset SCRIPTED_TOOLS SCRIPTED_ARTIFACTS
 ```
 
-Scripted calls follow the same Plan operation selection as direct MCP calls. Keeping `GET /todos/{todoId}` selected therefore also leaves its generated `get_todos_todoid` Tool visible on this Exposition. The cross-Service `get_users_userid` Tool is selected on the Users Plan but is not added to the Todos endpoint.
+In reShapr `1.1.0`, a scripted Custom Tool can call its declared lower-level Tools even when they are not selected for direct MCP access. The `tools` allow-list permits the internal `get_todos_todoid` call without exposing that primitive on this endpoint. The cross-Service `get_users_userid` Tool is selected on the Users Plan but is not added to the Todos endpoint. Operation selection controls client-visible discovery and calls; it is not backend authorization.
 
 Set the scheme for your environment. reShapr Online uses `https`; the local Compose proxy uses `http`:
 
@@ -177,6 +176,8 @@ export MCP_URL="https://$TODOS_MCP_ENDPOINT"
 ```
 
 If the returned endpoint already includes a scheme, assign it directly instead.
+
+If a newly created endpoint returns `404` despite appearing in `reshapr expo get`, check **[proxy synchronization](./operations/troubleshoot.md#proxy-did-not-receive-a-recent-change)**. This occurred during the `1.1.0` replay and required a controlled proxy restart before the calls below could complete.
 
 ## List and call the workflow Tool
 
@@ -304,7 +305,7 @@ Recreate only the proxy with the one-millisecond test limit:
 
 ```bash
 docker compose \
-  --file "$HOME/.reshapr/docker-compose-1.0.0.yml" \
+  --file "$HOME/.reshapr/docker-compose-1.1.0.yml" \
   --file scripted-timeout.override.yaml \
   up --detach --force-recreate gateway-01
 ```
@@ -315,13 +316,13 @@ Restore the release default and remove the temporary override:
 
 ```bash
 docker compose \
-  --file "$HOME/.reshapr/docker-compose-1.0.0.yml" \
+  --file "$HOME/.reshapr/docker-compose-1.1.0.yml" \
   up --detach --force-recreate gateway-01
 
 rm scripted-timeout.override.yaml
 ```
 
-For another deployment model, set `RESHAPR_GATEWAY_SCRIPTING_TIMEOUT` in the proxy workload and perform its normal rolling restart. The timeout cancellation is best effort: it interrupts blocking backend calls and waits, but it cannot forcibly stop a pure CPU loop in the JavaScript engine.
+For another deployment model, set `RESHAPR_GATEWAY_SCRIPTING_TIMEOUT` in the proxy workload and perform its normal rolling restart. In `1.1.0`, timeout cancellation interrupts script execution, including CPU-only loops, as covered by the release's sandbox regression test. It does not roll back backend calls already completed or guarantee cancellation of an external request already sent.
 
 ## Result
 

@@ -2,8 +2,8 @@
 description: Turn the Open-Meteo endpoint into one agent-oriented action, filter its result, and measure the change using two Configuration Plans.
 verification:
   product: reShapr
-  version: 1.0.0
-  date: 2026-09-22
+  version: 1.1.0
+  date: 2026-10-20
 release_review:
   runtime: 1.1.0
   controllers: 0.0.4

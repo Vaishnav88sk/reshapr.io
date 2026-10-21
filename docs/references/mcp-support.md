@@ -107,4 +107,4 @@ The historical Service endpoint can advertise the deterministic Exposition endpo
 - **[McpProtocolVersionRoutingTest](https://github.com/reshaprio/reshapr/blob/1.1.0/proxy/src/test/java/io/reshapr/proxy/mcp/McpProtocolVersionRoutingTest.java)** verifies session/stateless routing, modern headers, unsupported versions, removed methods, and unimplemented methods.
 - The **[official MCP specification](https://modelcontextprotocol.io/specification/)** owns the protocol semantics beyond reShapr's implementation boundary.
 
-This matrix was last verified with reShapr `1.1.0` on 2026-09-21. Recheck the owner code and tests before changing a version, mode, or method classification.
+The `1.1.0` matrix is based on the release-tagged sources above. On 2026-10-20, live replay confirmed stateless discovery, Tool calls, Prompt and Resource lists, and session-based initialization and Tool listing. Other version/method combinations were not all replayed live. Recheck the owner code and tests before changing a version, mode, or method classification.

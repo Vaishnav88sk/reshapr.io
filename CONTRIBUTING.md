@@ -61,6 +61,10 @@ If you use Generative AI tools (like GitHub Copilot, Cursor, etc.) to assist in 
 
 New features and bug fixes should be accompanied by automated tests. Pull requests that add functionality without corresponding test coverage may be asked to add it before merging.
 
+### Documentation verification
+
+The public `Verified` banner identifies the product, version and date of the last complete page verification. Advance `verification.version` and `verification.date` only after checking all documented procedural paths, alternatives and expected results against the published release. A partial replay does not qualify: retain the previous complete verification and record useful partial results, blockers and remaining checks in the private maintenance registry for the next full-page verification. Do not add `verification.scope` to public frontmatter. `release_review` records a separate release-source review and does not imply execution or appear in the banner.
+
 ## Conventional commits
 
 Our repositories follow [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) specification. Releasing to GitHub and NPM is done with the support of [semantic-release](https://semantic-release.gitbook.io/semantic-release/).

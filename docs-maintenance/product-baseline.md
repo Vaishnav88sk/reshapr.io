@@ -1,12 +1,12 @@
 # Product baseline
 
-**Baseline date:** 2026-10-19
+**Baseline date:** 2026-10-21
 
 **Runtime:** reShapr `1.1.0`
 
 **Controllers:** `0.0.4`
 
-**Helm charts:** `0.0.15`
+**Helm charts:** `0.0.16`
 
 This is the factual index used to review documentation claims. It is not a substitute for release artifacts or owner-repository contracts. A row means that the evidence was reviewed; it does not make this file evidence.
 
@@ -16,10 +16,12 @@ This is the factual index used to review documentation claims. It is not a subst
 |---|---|---|---|---|
 | `reshaprio/reshapr` | `1.1.0` | `bd55008a322e56f7d2dac7e96cadc7211e5c09a9` | release-tagged implementation and tests | same commit |
 | `reshaprio/reshapr-controllers` | `0.0.4` | `4c11573b91a3361d7b76f4450d39bec9271b2059` | eight CRDs and reconcilers | same commit |
-| `reshaprio/reshapr-helm-charts` | corrected `0.0.15` | `c62e8e7e7af77bc008805c117341ae34da6a1fc5` | corrected tag and published OCI chart | same commit |
+| `reshaprio/reshapr-helm-charts` | `0.0.16` | `3fa540d4a0aaa26e0718152678a24e2cd6a00c83` | release tag and four published OCI charts | same commit |
 | `reshaprio/reshapr.io` | current corpus | `10140fb7a8c847b338fe4e0b105518e3d68e8101` | `main` plus reviewed working tree | same HEAD |
 
-Release-update review, 2026-10-19: compared the previous baseline to the refs above. The Helm `0.0.15` tag was corrected during review; the earlier `bcefdeec15e0faf5119cb5a3e46dadff59e39769` artifact is superseded and must not be used as evidence for eight-CRD packaging. The corrected published controllers chart has digest `sha256:8dbdc4e089ea92a2b387e38b3eeb7f5c5ad54eef224a5e590ada40e83fc28c46`; `helm show crds` confirms all eight kinds and ConfigurationPlan `toolExposureMode`.
+Release-update review, 2026-10-21: Helm `0.0.16` removes the proxy's incomplete HPA-specific Deployment and uses the clustering-capable Deployment for both autoscaling modes. The four published OCI artifacts were pulled and installed in isolated Minikube namespaces with runtime `1.1.0` and controllers `0.0.4`. Live checks cover the main production-guide path, a three-member cluster and direct cross-pod sessions, HTTPS UI/readiness, both admission replicas, HPA metrics, and MCP backend dispatch. The [dated Kubernetes replay report](replay/2026-10-21-kubernetes-0.0.16.md) records adaptations, digests, failures corrected, and outstanding full-page checks. Public verification remains historical; alternative certificate providers, enforcing CNI policies, and production infrastructure are not qualified by this local replay.
+
+Historical release-update review, 2026-10-19: the baseline used runtime `1.1.0`, controllers `0.0.4`, and corrected charts `0.0.15` at `c62e8e7e7af77bc008805c117341ae34da6a1fc5`. The Helm `0.0.15` tag was corrected during review; the earlier `bcefdeec15e0faf5119cb5a3e46dadff59e39769` artifact is superseded and must not be used as evidence for eight-CRD packaging. The corrected published controllers chart has digest `sha256:8dbdc4e089ea92a2b387e38b3eeb7f5c5ad54eef224a5e590ada40e83fc28c46`; `helm show crds` confirms all eight kinds and ConfigurationPlan `toolExposureMode`.
 
 The documentation working tree is dirty, and its commit does not include these edits. New `release_review` frontmatter identifies a source-contract review, not a live command replay. Existing `verification` dates and versions remain historical replay evidence; do not interpret them as verification of newly substituted release commands. Changed live procedures still require an isolated-environment replay before their verification markers can advance.
 
@@ -31,7 +33,18 @@ Preflight evidence recorded on 2026-10-19:
 - `helm show crds` on the corrected controllers chart confirms all eight CRDs and the ConfigurationPlan `toolExposureMode` enum.
 - No `APPLY=true` checks were run. The configured Minikube API was unreachable; no cluster changes or live backend, host-UI, OIDC, credential, or script execution replay is claimed.
 
-Published chart digests:
+Follow-up live replay, 2026-10-20: the published CLI and Docker images `1.1.0` were exercised in a disposable local stack covering Compose, CLI imports and CI automation, MCP, Context Control, scripted Tools, API-key rotation, administration, synchronization recovery, and the Web UI Quick Start. Review on 2026-10-21 retained current public verification only for the three fully replayed pages: Context Control, Artifact selection and API-key protection. Other pages retain their previous complete verification. The [dated replay report](replay/2026-10-20-runtime-1.1.0.md) keeps partial results and the remaining full-page checks privately. This supersedes the no-live-replay statement above only for the executed paths, not Kubernetes, OIDC/OAuth, audit export, or database encryption rotation.
+
+Published chart digests for the current baseline:
+
+| Chart 0.0.16 | OCI digest |
+|---|---|
+| control-plane | `sha256:a8576aae43f6e3427f62f70090333e60ce4f9d3cf3ced533855aa546fc683acb` |
+| proxy | `sha256:935eab058a2a61e5b7c37cb29d482f38f8c75d1ef884f5d1937ad9f694d28841` |
+| web-ui | `sha256:83fa5ac7c2becd08ba9eb42398221ac84795aaf88dba4a35253897cb46a322cd` |
+| controllers | `sha256:2a6e87bdbdd6b2cdd133ef0b07a52a1cb209a66f3aa88122736f8b34c99eb7b8` |
+
+Historical published chart digests:
 
 | Chart 0.0.15 | OCI digest |
 |---|---|
@@ -189,7 +202,7 @@ Status totals for this baseline are 78 `released`, 5 `partial`, 7 `unsupported`,
 | `CAP-HELM-REPLICATION-AND-PDB` | released | Configure control-plane and Web UI replicas, anti-affinity, and disruption budgets. | `reshapr-helm-charts`: production values and PDB templates | `LIM-HA-INFRASTRUCTURE-DEPENDENT` |
 | `CAP-HELM-PROXY-HPA` | released | Autoscale proxy replicas from CPU and memory metrics. | `reshapr-helm-charts`: proxy HPA template | `LIM-HPA-PROXY-ONLY` |
 | `CAP-HELM-PROXY-CLUSTERING` | released | Cluster proxies with encrypted Infinispan/JGroups state traffic. | `reshapr-helm-charts`: headless Service and clustering configuration | none |
-| `CAP-HELM-NETWORK-POLICY` | partial | Restrict proxy clustering ingress with an optional NetworkPolicy. | `reshapr-helm-charts`: proxy NetworkPolicy template | `LIM-HELM-NETWORK-POLICY-PARTIAL` |
+| `CAP-HELM-NETWORK-POLICY` | partial | Optionally isolate proxy Pod ingress and allow same-release peers on the configured clustering ports. | `reshapr-helm-charts` 0.0.16: proxy NetworkPolicy template; CNI enforcement not qualified | `LIM-HELM-NETWORK-POLICY-PARTIAL` |
 | `CAP-HELM-PROMETHEUS-SCRAPING` | released | Expose proxy metrics through an optional Prometheus Operator ServiceMonitor. | `reshapr-helm-charts`: proxy ServiceMonitor template | `LIM-SERVICEMONITOR-PROXY-ONLY` |
 | `CAP-HELM-CONTROLLER-TOGGLES` | released | Enable the operator and admission controller independently. | `reshapr-helm-charts`: controllers values and conditionals | `LIM-HELM-CONTROLLERS-RELEASE-MISMATCH` |
 | `CAP-HELM-WEBHOOK-CERTIFICATE-PROVIDERS` | released | Choose cert-manager, OpenShift Service CA, or existing webhook certificates. | `reshapr-helm-charts`: controllers certificate values and templates | none |
@@ -261,7 +274,7 @@ Limitations remain in this registry after resolution so historical claims stay t
 | `LIM-HELM-SECURITY-CONTEXT-PARTIAL` | active | charts 0.0.15 | `runAsNonRoot` is not uniformly enforced and controller security contexts are empty by default. | `CAP-HELM-SECURITY-CONTEXT` |
 | `LIM-HA-INFRASTRUCTURE-DEPENDENT` | active | charts 0.0.15 | Replicas and PDBs do not make the full system highly available without HA PostgreSQL and suitable infrastructure. | `CAP-HELM-REPLICATION-AND-PDB` |
 | `LIM-HPA-PROXY-ONLY` | active | charts 0.0.15 | HPA is provided for the proxy only and scales from CPU and memory metrics. | `CAP-HELM-PROXY-HPA` |
-| `LIM-HELM-NETWORK-POLICY-PARTIAL` | active | charts 0.0.15 | The optional policy covers proxy clustering ingress only; it adds no complete egress or cross-chart policy. | `CAP-HELM-NETWORK-POLICY` |
+| `LIM-HELM-NETWORK-POLICY-PARTIAL` | active | charts 0.0.15; reviewed 0.0.16 | The optional policy isolates all proxy Pod ingress but allows only configured clustering ports from same-release peers. HTTP ingress and monitoring require additional allows on an enforcing CNI; runtime clustering ports also need qualification. It adds no egress policy. The production example disables this incomplete policy. | `CAP-HELM-NETWORK-POLICY` |
 | `LIM-HELM-CONTROLLERS-RELEASE-MISMATCH` | active | charts 0.0.15 / controllers 0.0.4 | The controllers chart packages the controllers `0.0.4` CRDs, but defaults image tags to `nightly` while `Chart.yaml` and installation notes report app version `0.0.1`; pin image tags and inspect running images. | `CAP-HELM-FOUR-OCI-CHARTS`, `CAP-HELM-CONTROLLER-TOGGLES` |
 | `LIM-SERVICEMONITOR-PROXY-ONLY` | active | charts 0.0.15 | ServiceMonitor support is optional and limited to proxy metrics. | `CAP-HELM-PROMETHEUS-SCRAPING` |
 | `LIM-PRODUCTION-PROFILES-NOT-CERTIFICATION` | active | charts 0.0.15 | Production values are starting profiles, not environment-specific sizing or security certification. | `CAP-HELM-ENVIRONMENT-PROFILES` |

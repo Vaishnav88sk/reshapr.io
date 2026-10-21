@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import {fileURLToPath} from 'node:url';
+import matter from 'gray-matter';
 
 const repositoryRoot = fileURLToPath(new URL('../', import.meta.url));
 const supportPage = fs.readFileSync(
@@ -60,6 +61,62 @@ function readOwnerSource(relativePath) {
   const sourcePath = path.join(sourceRoot, relativePath);
   return fs.existsSync(sourcePath) ? fs.readFileSync(sourcePath, 'utf8') : null;
 }
+
+test('keeps partial replay scope out of public verification metadata and banners', () => {
+  for (const relativePath of fs.readdirSync(path.join(repositoryRoot, 'docs'), {recursive: true}).filter(name => /\.mdx?$/.test(name))) {
+    const {data} = matter(fs.readFileSync(path.join(repositoryRoot, 'docs', relativePath), 'utf8'));
+    assert.ok(!data.verification || !Object.hasOwn(data.verification, 'scope'), `Public verification scope in ${relativePath}`);
+  }
+  const banner = fs.readFileSync(path.join(repositoryRoot, 'src/theme/DocItem/Verification/index.js'), 'utf8');
+  assert.match(banner, /<strong>Verified<\/strong>/);
+  assert.doesNotMatch(banner, /releaseReview|verification\.scope|Targets|Replayed/);
+});
+
+test('keeps the Kubernetes production example on the replayed chart configuration', () => {
+  const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/deploy-kubernetes-production.md'), 'utf8');
+  const {data} = matter(guide);
+  assert.equal(data.release_review.charts, '0.0.16');
+  assert.deepEqual([...guide.matchAll(/--version (0\.0\.\d+)/g)].map(match => match[1]), Array(4).fill('0.0.16'));
+  const values = [...guide.matchAll(/```yaml\n([\s\S]*?)\n```/g)].map(match => matter(`---\n${match[1]}\n---\n`).data);
+  const ui = values.find(value => value.publicUrl);
+  assert.equal(ui.ingress.annotations['nginx.ingress.kubernetes.io/proxy-buffer-size'], '16k');
+  const proxy = values.find(value => value.clustering);
+  assert.equal(proxy.clustering.enabled, true);
+  assert.equal(proxy.autoscaling.enabled, true);
+  assert.equal(proxy.clustering.networkPolicy.enabled, false);
+});
+
+test('keeps scripted sample contract versions separate from the runtime release', () => {
+  const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/build-scripted-custom-tool.md'), 'utf8');
+  const parseYaml = relativePath => matter(`---\n${fs.readFileSync(path.join(repositoryRoot, relativePath), 'utf8')}\n---\n`).data;
+  const todos = parseYaml('static/examples/scripted-custom-tools/todos-openapi.yaml');
+  const users = parseYaml('static/examples/scripted-custom-tools/users-openapi.yaml');
+  const artifact = parseYaml('static/examples/scripted-custom-tools/todo-workflow.yaml');
+  for (const contract of [todos, users]) {
+    assert.ok(guide.includes(`.name == "${contract.info.title}" and .version == "${contract.info.version}"`));
+  }
+  assert.equal(artifact.service.version, todos.info.version);
+  const documentedAllowList = matter(`---\n${guide.match(/```yaml\n([\s\S]*?)\n```/)[1]}\n---\n`).data;
+  assert.deepEqual(documentedAllowList.tools, artifact.customTools.inspect_todo_and_owner.tools);
+  assert.equal(documentedAllowList.tools[1].service, `${users.info.title}:${users.info.version}`);
+  const selected = JSON.parse(guide.match(/SCRIPTED_TOOLS='([\s\S]*?)'/)[1]);
+  assert.ok(selected.includes('inspect_todo_and_owner'));
+  assert.ok(!selected.includes('GET /todos/{todoId}'));
+  const composePaths = [...guide.matchAll(/docker-compose-([\d.]+)\.yml/g)];
+  assert.equal(composePaths.length, 2);
+  assert.ok(composePaths.every(match => match[1] === '1.1.0'));
+});
+
+test('retains corrections established by the 1.1.0 administration replay', () => {
+  const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/administration/organizations-and-memberships.md'), 'utf8');
+  const owner = guide.slice(guide.indexOf('### Assign or replace the owner'), guide.indexOf('### Replace an existing user'));
+  assert.ok(owner.includes("--header 'Content-Type: text/plain'"));
+  assert.ok(owner.includes('--data "${OWNER_USERNAME}"'));
+  assert.ok(!owner.includes('OWNER_REQUEST'));
+  const quotas = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/administration/organization-quotas.md'), 'utf8');
+  assert.match(quotas, /preserves consumed units and recalculates `remaining`/);
+  assert.doesNotMatch(quotas, /does not increase its existing `remaining`|does not add to `remaining`/);
+});
 
 test('documents Code Mode discovery and a locally executable reduced-result example', () => {
   const guide = fs.readFileSync(path.join(repositoryRoot, 'docs/how-to-guides/use-code-mode.md'), 'utf8');

@@ -7,8 +7,8 @@ verification:
 release_review:
   runtime: 1.1.0
   controllers: 0.0.4
-  charts: 0.0.15
-  date: 2026-10-19
+  charts: 0.0.16
+  date: 2026-10-21
   scope: release-tagged source review; not a live command replay
 ---
 
@@ -29,9 +29,9 @@ This is a production-oriented starting point, not a universal production certifi
 - Prometheus Operator CRDs when enabling `ServiceMonitor`
 - reShapr CLI `1.1.0` with administrative access after the control plane starts
 
-This guide uses Helm charts `0.0.15`, controllers `0.0.4`, and runtime images `1.1.0`. The charts default to `nightly`, so the overrides below pin the reviewed release candidates instead.
+This guide uses Helm charts `0.0.16`, controllers `0.0.4`, and runtime images `1.1.0`. The charts default to `nightly`, so the overrides below pin the reviewed releases instead.
 
-The [chart release](https://github.com/reshaprio/reshapr-helm-charts/releases/tag/0.0.15) owns packaging. The [reShapr release](https://github.com/reshaprio/reshapr/releases/tag/1.1.0) owns runtime behavior.
+The [chart release](https://github.com/reshaprio/reshapr-helm-charts/releases/tag/0.0.16) owns packaging. The [reShapr release](https://github.com/reshaprio/reshapr/releases/tag/1.1.0) owns runtime behavior.
 
 ## 1. Choose the topology
 
@@ -68,12 +68,18 @@ Provision these Secrets with your external secret manager, encrypted Git workflo
 | `reshapr-system` | `reshapr-db-credentials` | `password` | Control plane external PostgreSQL |
 | `reshapr-system` | `reshapr-admin-credentials` | `name`, `password`, `email`, `default-gateway-tokens` | Initial administrator and Gateway token |
 | `reshapr-system` | `reshapr-api-key-secret` | `api-key` | Control plane admin API |
-| `reshapr-system` | `reshapr-encryption-key-secret` | `encryption-key-v1`; `encryption-key` only while migrating legacy values | Sensitive data encryption |
+| `reshapr-system` | `reshapr-encryption-key-secret` | `encryption-key-v1`, `encryption-key` | Sensitive data encryption |
 | `reshapr-system` | `reshapr-jwt-keys-secret` | `private-key.pem`, `public-key.pem` | JWT signing and verification |
 | `reshapr-system` | `reshapr-web-ui-api-key` | `api-key` | Web UI server-side API access |
 | `reshapr-proxies` | `reshapr-gateway-token` | `token` | Proxy registration with the control plane |
 
-Generate each AES-256 key as 32 random bytes encoded with Base64, for example with `openssl rand -base64 32`. Do not pass secret values with Helm `--set`: they can remain in shell history and Helm release metadata. The [control-plane values](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.15/control-plane/values.yaml), [proxy values](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.15/proxy/values.yaml), and [Web UI values](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.15/web-ui/values.yaml) define the exact Secret contracts.
+Generate each AES-256 key as 32 random bytes encoded with Base64, for example with `openssl rand -base64 32`. Do not pass secret values with Helm `--set`: they can remain in shell history and Helm release metadata. The [control-plane values](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.16/control-plane/values.yaml), [proxy values](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.16/proxy/values.yaml), and [Web UI values](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.16/web-ui/values.yaml) define the exact Secret contracts.
+
+Chart `0.0.16` requires the legacy `encryption-key` entry even on a fresh installation because the Deployment references it unconditionally. Supply a separate 16-, 24-, or 32-character legacy key as well as the Base64-encoded AES-256 key. New encrypted values use `encryption-key-v1`; retain the original legacy key when migrating an existing database.
+
+Store raw bootstrap Gateway tokens in `default-gateway-tokens`. The proxy Secret's `token` entry must contain `<organization-id>-<raw-token>`, for example `reshapr-<raw-token>` for the bootstrap organization. The organization prefix is required for Gateway authentication.
+
+Provision TLS Secrets of type `kubernetes.io/tls` containing `tls.crt` and `tls.key`: `reshapr-ctrl-tls` and `reshapr-web-ui-tls` in `reshapr-system`, and `reshapr-gateway-tls` in `reshapr-proxies`. Their certificates must cover the configured public DNS names and be trusted by your clients. The ingress examples reference these Secrets; the charts do not issue these public certificates.
 
 ## 3. Configure the control plane
 
@@ -109,6 +115,7 @@ externalDatabase:
 
 admin:
   existingSecret: reshapr-admin-credentials
+  defaultGatewayLabels: "env=production;region=eu-west-1;cluster=prod-01"
 apiKey:
   existingSecret: reshapr-api-key-secret
 encryptionKey:
@@ -134,16 +141,16 @@ ingress:
         - app.reshapr.example.com
 ```
 
-      Replace `<ingress-class>` with an `IngressClass` supported by your Kubernetes platform. List the available classes with `kubectl get ingressclass`, then follow that controller's documentation for any required annotations or TLS behavior. The reShapr charts create standard `networking.k8s.io/v1` Ingress resources but do not install or qualify an ingress controller.
+  Replace `<ingress-class>` with an `IngressClass` supported by your Kubernetes platform. List the available classes with `kubectl get ingressclass`, then follow that controller's documentation for any required annotations or TLS behavior. The reShapr charts create standard `networking.k8s.io/v1` Ingress resources but do not install or qualify an ingress controller.
 
-Add pod anti-affinity, topology spread, tolerations, and node selection according to your cluster. The release-tagged [`values-production.yaml`](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.15/control-plane/values-production.yaml) provides a larger example, but keep the `1.1.0` image override above.
+Add pod anti-affinity, topology spread, tolerations, and node selection according to your cluster. The release-tagged [`values-production.yaml`](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.16/control-plane/values-production.yaml) provides a larger example, but keep the `1.1.0` image override above.
 
 Install the release:
 
 ```bash
 helm upgrade --install reshapr-control-plane \
   oci://quay.io/reshapr/reshapr-helm-charts/reshapr-control-plane \
-  --version 0.0.15 \
+  --version 0.0.16 \
   --namespace reshapr-system \
   --values values/control-plane.yaml
 ```
@@ -183,6 +190,8 @@ publicUrl: https://ui.reshapr.example.com
 ingress:
   enabled: true
   className: "<ingress-class>"
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
   hosts:
     - host: ui.reshapr.example.com
       paths:
@@ -194,12 +203,14 @@ ingress:
         - ui.reshapr.example.com
 ```
 
+The buffer annotation is specific to ingress-nginx. Its default response-header buffer can reject the Web UI's headers with HTTP 502 and `upstream sent too big header`; the example increases it to 16 KiB. For another ingress controller, configure the equivalent response-header limit according to its documentation.
+
 Install and verify it:
 
 ```bash
 helm upgrade --install reshapr-ui \
   oci://quay.io/reshapr/reshapr-helm-charts/reshapr-web-ui \
-  --version 0.0.15 \
+  --version 0.0.16 \
   --namespace reshapr-system \
   --values values/web-ui.yaml
 kubectl get pods --namespace reshapr-system \
@@ -209,7 +220,7 @@ curl --fail --silent --head https://ui.reshapr.example.com
 
 ## 5. Configure the controllers
 
-Pin controllers `0.0.4` when using charts `0.0.15`. Create `values/controllers.yaml`:
+Pin controllers `0.0.4` when using charts `0.0.16`. Create `values/controllers.yaml`:
 
 ```yaml
 operator:
@@ -231,16 +242,22 @@ admissionController:
   replicaCount: 2
   certificate:
     provider: cert-manager
+    certManager:
+      issuerRef:
+        name: reshapr-admission-issuer
+        kind: Issuer
 ```
 
-Use `openshift` or `existing` instead when those certificate providers match your platform. The [controllers chart reference](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.15/controllers/README.md) documents all three modes. Chart `0.0.15` packages the controllers `0.0.4` CRDs for a fresh installation; follow the upgrade guide when CRDs from an older release already exist.
+Create a ready cert-manager `Issuer` named `reshapr-admission-issuer` in `reshapr-system` before installing this release. It must sign certificates with a non-empty issuer distinguished name, for example through an existing CA-backed issuer. With chart `0.0.16` and controllers `0.0.4`, the default self-signed issuer produces an empty issuer name that the Java runtime rejects when loading the webhook's PKCS12 keystore.
+
+Use `openshift` or `existing` instead when those certificate providers match your platform. The [controllers chart reference](https://github.com/reshaprio/reshapr-helm-charts/blob/0.0.16/controllers/README.md) documents all three modes. Chart `0.0.16` packages the controllers `0.0.4` CRDs for a fresh installation; follow the upgrade guide when CRDs from an older release already exist.
 
 Install the release:
 
 ```bash
 helm upgrade --install reshapr-controllers \
   oci://quay.io/reshapr/reshapr-helm-charts/reshapr-controllers \
-  --version 0.0.15 \
+  --version 0.0.16 \
   --namespace reshapr-system \
   --values values/controllers.yaml
 ```
@@ -286,7 +303,7 @@ gateway:
 clustering:
   enabled: true
   networkPolicy:
-    enabled: true
+    enabled: false
 autoscaling:
   enabled: true
   minReplicas: 3
@@ -313,16 +330,20 @@ ingress:
         - mcp.reshapr.example.com
 ```
 
+The `admin.defaultGatewayLabels` value in the control-plane example matches these proxy labels so that the bootstrap `Default Gateway Group` selects the production proxies. If you use another Gateway Group, match that group's selectors instead; a `READY` Exposition assigned to a group with no matching proxy cannot serve MCP requests.
+
 The chart encrypts JGroups traffic and can generate its clustering keystore. For controlled rotation and disaster recovery, provision `clustering.encryption.existingSecret` instead and manage the keystore lifecycle explicitly.
 
-The chart's NetworkPolicy covers JGroups clustering traffic only. It is not a complete namespace ingress or egress policy. `ServiceMonitor` requires the Prometheus Operator CRD; disable it when that API is unavailable.
+Use chart `0.0.16` or later when enabling both clustering and autoscaling. Chart `0.0.15` omitted the clustering configuration from its HPA-specific Deployment template.
+
+The bundled JGroups NetworkPolicy is disabled in this example. In chart `0.0.16`, it isolates ingress to proxy Pods but permits only its configured JGroups ports: on an enforcing CNI, HTTP traffic from ingress and monitoring also needs an allow policy. Before enabling it, add reviewed policies for the required flows, qualify health probes, and verify that the allowed clustering ports match the runtime's actual listening ports. Define egress policies separately. `ServiceMonitor` requires the Prometheus Operator CRD; disable it when that API is unavailable.
 
 Install the release:
 
 ```bash
 helm upgrade --install reshapr-proxy \
   oci://quay.io/reshapr/reshapr-helm-charts/reshapr-proxy \
-  --version 0.0.15 \
+  --version 0.0.16 \
   --namespace reshapr-proxies \
   --values values/proxy.yaml
 ```
@@ -361,7 +382,7 @@ Health probes show that workloads can serve traffic. This MCP request additional
 
 ## Result
 
-The four charts are installed at `0.0.15`, the runtime workloads use `1.1.0`, the controllers use `0.0.4`, PostgreSQL and credentials are externally managed, public routes use TLS, and a production ingress answers a functional MCP request.
+The four charts are installed at `0.0.16`, the runtime workloads use `1.1.0`, the controllers use `0.0.4`, PostgreSQL and credentials are externally managed, public routes use TLS, and a production ingress answers a functional MCP request.
 
 ## Limits
 
@@ -371,11 +392,11 @@ The four charts are installed at `0.0.15`, the runtime workloads use `1.1.0`, th
 - The generated clustering keystore is retained across Helm upgrades. Database encryption-key rotation is administrator-triggered; general credential rotation and backup are not automated.
 - The charts do not provide automated rollback or database backup and restore.
 - TLS terminates at ingress in this topology. Internal transport security depends on your cluster network and service-mesh policy.
-- The chart NetworkPolicy protects JGroups traffic only; define broader policies separately.
+- NetworkPolicy enforcement is CNI-dependent. The bundled policy is disabled here; qualify cluster, HTTP, health, and monitoring connectivity before enabling reviewed policies.
 - A `ServiceMonitor` only creates a scrape target. Alerting, retention, dashboards, and SLOs remain external responsibilities.
 
 ## Next step
 
 Use **[Observe the reShapr Proxy](./operations/observe-and-audit.md)** to connect the proxy to your telemetry pipeline. Use **[Upgrade reShapr and Rotate Runtime Secrets](./operations/upgrade-and-rotate.md)** to prepare the next maintenance window, or **[Manage reShapr Resources with GitOps](./manage-resources-with-gitops.md)** to operate endpoint desired state and cleanup.
 
-Use the release-tagged [chart READMEs and values](https://github.com/reshaprio/reshapr-helm-charts/tree/0.0.15) when adapting this bounded topology.
+Use the release-tagged [chart READMEs and values](https://github.com/reshaprio/reshapr-helm-charts/tree/0.0.16) when adapting this bounded topology.

@@ -114,6 +114,6 @@ You used the Web UI to import an OpenAPI 3 contract, inspect its Service, config
 
 ## Evidence and limits
 
-This tutorial was last verified with reShapr `1.1.0` on 2026-09-18. Its workflow follows the release-tagged **[Quick Start wizard](https://github.com/reshaprio/reshapr/blob/1.1.0/web-ui/src/lib/components/artifacts/QuickStartWizard.svelte)** and **[Artifact import form](https://github.com/reshaprio/reshapr/blob/1.1.0/web-ui/src/lib/components/artifacts/ImportArtifactForm.svelte)**.
+This tutorial was replayed with the published reShapr `1.1.0` Web UI on 2026-10-20. Optional endpoint security was not replayed. Its workflow follows the release-tagged **[Quick Start wizard](https://github.com/reshaprio/reshapr/blob/1.1.0/web-ui/src/lib/components/artifacts/QuickStartWizard.svelte)** and **[Artifact import form](https://github.com/reshaprio/reshapr/blob/1.1.0/web-ui/src/lib/components/artifacts/ImportArtifactForm.svelte)**.
 
 Quick Start uses the `default` Plan and Default Gateway Group rather than asking you to choose names or a target group. Use the full Plan and Exposition views when you need several Plans, another Gateway Group, or more control over the exposed MCP surface.
